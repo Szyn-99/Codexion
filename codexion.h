@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/09 07:13:59 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/09 07:28:23 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-
+# include <pthread.h>
 // parsing phase
 typedef struct s_parse
 {
