@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:23:42 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/09 07:02:40 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/09 09:03:32 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,12 @@ int	yes_space(char c)
 {
 	return ((c >= 9 && c <= 13) || c == ' ');
 }
+
 int	yes_int(char c)
 {
 	return (c >= '0' && c <= '9');
 }
+
 int	ft_atoi(char *str)
 {
 	int		i;

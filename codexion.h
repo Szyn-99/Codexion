@@ -12,10 +12,10 @@
 
 #ifndef CODEXION_H
 # define CODEXION_H
+# include <pthread.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <pthread.h>
 // parsing phase
 typedef struct s_parse
 {

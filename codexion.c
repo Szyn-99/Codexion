@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:08:08 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/09 07:17:08 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/09 09:03:17 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,4 @@ int	main(int ac, char **av)
 	printf("scheduler: %s\n", coders_metada->scheduler);
 	printf("parse_result: %d\n", coders_metada->parse_result);
 	free(coders_metada);
-    FILE* file = 
 }
