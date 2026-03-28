@@ -4,6 +4,7 @@ FLAGS = -Wall -Wextra -Werror
 SOURCE_FILE = codexion.c \
 			parsing_arguments.c \
 			parsing_arguments_tool.c \
+			coders_routine.c \
 			
 OBJECT_FILE = $(SOURCE_FILE:.c=.o)
 

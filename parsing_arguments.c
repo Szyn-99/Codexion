@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_arguments.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:06:56 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/09 07:13:29 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/17 10:48:32 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,8 @@ int	parse_scheduler(char *s, t_parse *main)
 void	ft_codexion_parser(t_parse *main, char **av, int ac)
 {
 	int		j;
-	char	*s;
 
 	j = 1;
-	s = av[ac - 1];
 	if (parse_scheduler(av[ac - 1], main) == -42)
 	{
 		return ;

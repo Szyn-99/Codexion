@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/09 07:28:23 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/22 10:45:40 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <bool.h>
+
+#define PARENT_POS(x) (((x) - 1) / 2)
 // parsing phase
 typedef struct s_parse
 {
@@ -35,4 +38,21 @@ int			yes_space(char c);
 int			ft_atoi(char *str);
 int			yes_int(char c);
 
+// some complexe things
+typedef struct s_coder
+{
+	int priority;
+	int id;
+} t_coder;
+
+typedef struct s_min_heap
+{
+	t_coder *coders;
+	int size;
+	int total;
+} t_min_heap;
+
+
+// pthreads phase
+void *compiling(void *a);
 #endif
