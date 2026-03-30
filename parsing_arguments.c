@@ -3,14 +3,49 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_arguments.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:06:56 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/17 10:48:32 by szyn             ###   ########.fr       */
+/*   Updated: 2026/03/30 12:05:16 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
+int	yes_space(char c)
+{
+	return ((c >= 9 && c <= 13) || c == ' ');
+}
+
+int	yes_int(char c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+int	ft_atoi(char *str)
+{
+	int		i;
+	int		space_length;
+	long	result;
+
+	i = 0;
+	space_length = 0;
+	result = 0;
+	while (str[i] != '\0')
+	{
+		if (yes_space(str[i]))
+			space_length++;
+		else if (((result * 10) + (str[i] - '0')) > 2147483647)
+			return (-42);
+		else if (yes_int(str[i]))
+			result += (result * 10) + (str[i] - '0');
+		else
+			return (-42);
+		i++;
+	}
+	return (result);
+}
+
 
 void	init_coders_metadata(t_parse *main, char **av)
 {

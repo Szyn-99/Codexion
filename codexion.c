@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:08:08 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/22 08:29:11 by szyn             ###   ########.fr       */
+/*   Updated: 2026/03/30 10:30:43 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int	main(int ac, char **av)
 		return (1);
 	}
 	pthread_t coders;
-	pthread_create(&coders, NULL, compiling, NULL);
 	pthread_join(coders, NULL);
 	printf("number_of_coders: %d\n", data->number_of_coders);
 	printf("time_to_burnout: %d\n", data->time_to_burnout);

@@ -3,8 +3,11 @@ HEADER = codexion.h
 FLAGS = -Wall -Wextra -Werror
 SOURCE_FILE = codexion.c \
 			parsing_arguments.c \
-			parsing_arguments_tool.c \
 			coders_routine.c \
+			codexion_free_utils.c \
+			codexion_init.c \
+			priority_queue.c \
+			
 			
 OBJECT_FILE = $(SOURCE_FILE:.c=.o)
 
