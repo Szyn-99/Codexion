@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 18:16:03 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 19:07:35 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void *coders_routine(void *arg)
     while(!coder->sim->sim_over)
     {
         take_two_dongles(coder->sim, coder, rd, ld);
+        
     }
 
     
