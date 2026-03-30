@@ -1,9 +1,8 @@
 NAME = codexion
 HEADER = codexion.h
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -g -Wall -Wextra -Werror
 SOURCE_FILE = codexion.c \
 			parsing_arguments.c \
-			coders_routine.c \
 			codexion_free_utils.c \
 			codexion_init.c \
 			priority_queue.c \

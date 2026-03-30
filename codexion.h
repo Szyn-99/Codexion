@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 11:53:01 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 12:23:13 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,20 @@ typedef struct s_dongle
 	int				in_use;
 }	t_dongle;
 
-typedef struct s_codexion
+typedef struct s_coder t_coder;
+
+typedef struct s_codexion t_codexion;
+
+struct s_coder
+{
+	pthread_t		thread;
+	t_codexion		*sim;
+	long			last_compile_start;
+	int				id;
+	int				compiles;
+};
+
+struct s_codexion
 {
 	t_dongle		*dongles;
 	t_coder			*coders;
@@ -67,16 +80,8 @@ typedef struct s_codexion
 	pthread_mutex_t	sim_mutex;
 	int				sim_over;
 	long			start;
-}	t_codexion;
+}	;
 
-typedef struct s_coder
-{
-	pthread_t		thread;
-	t_codexion		*sim;
-	long			last_compile_start;
-	int				id;
-	int				compiles;
-}	t_coder;
 
 void		ft_codexion_parser(t_parse *main, char **av, int ac);
 int			yes_space(char c);

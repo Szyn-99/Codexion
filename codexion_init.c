@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 10:50:16 by szyn              #+#    #+#             */
-/*   Updated: 2026/03/30 11:53:46 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 12:23:39 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,5 @@ bool codexion_init(t_codexion *cdx)
             free_coders(cdx);
             return false;
         }
-    
+    return true;
 }

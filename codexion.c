@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:08:08 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 10:30:43 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 13:50:26 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ int	main(int ac, char **av)
 		free(data);
 		return (1);
 	}
-	pthread_t coders;
-	pthread_join(coders, NULL);
+	// pthread_t coders = 2;
+	// pthread_join(coders, NULL);
 	printf("number_of_coders: %d\n", data->number_of_coders);
 	printf("time_to_burnout: %d\n", data->time_to_burnout);
 	printf("time_to_compile: %d\n", data->time_to_compile);
