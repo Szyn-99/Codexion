@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/22 09:44:16 by szyn              #+#    #+#             */
-/*   Updated: 2026/03/30 12:24:47 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 15:43:55 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void classic_swap(t_waiter *linus, t_waiter *torvalds)
     *linus = *torvalds;
     *torvalds = kernel;
 }
+
 void push_coder(int id, long priority, t_heap *heap)
 {
     heap->waiters[heap->size].id = id;

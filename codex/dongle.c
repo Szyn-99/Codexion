@@ -46,6 +46,7 @@ static int	my_turn(t_coder *coder, t_dongle *d)
 static void	wait_for_turn(t_coder *coder, t_dongle *d)
 {
 	struct timespec	ts;
+	struct timeval	tb;
 	long			deadline_ms;
 	long			remaining;
 

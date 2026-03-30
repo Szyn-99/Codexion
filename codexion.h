@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 12:23:13 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/30 15:44:11 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,8 @@ typedef struct s_dongle
 }	t_dongle;
 
 typedef struct s_coder t_coder;
-
 typedef struct s_codexion t_codexion;
+
 
 struct s_coder
 {
@@ -92,4 +92,10 @@ int			yes_int(char c);
 void free_coders(t_codexion *codex);
 bool destroy_resources(t_codexion *codex, int n_mutex, int n_cond);
 // pthreads phase
+// time utils
+long	get_time_ms(void);
+// priority heap
+void classic_swap(t_waiter *linus, t_waiter *torvalds);
+void push_coder(int id, long priority, t_heap *heap);
+void remove_coder(t_heap *heap);
 #endif
