@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 15:44:11 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/31 15:31:10 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <unistd.h>
 # include <stdbool.h>
 #include <sys/time.h>
-
 
 #define PARENT_POS(x) (((x) - 1) / 2)
 
@@ -60,7 +59,7 @@ typedef struct s_dongle
 typedef struct s_coder t_coder;
 typedef struct s_codexion t_codexion;
 
-
+void free_parser(t_codexion *codex);
 struct s_coder
 {
 	pthread_t		thread;
@@ -69,7 +68,7 @@ struct s_coder
 	int				id;
 	int				compiles;
 };
-
+void free_dongles(t_codexion *codex);
 struct s_codexion
 {
 	t_dongle		*dongles;
@@ -83,19 +82,49 @@ struct s_codexion
 }	;
 
 
+/* ========== parsing_arguments.c ========== */
 void		ft_codexion_parser(t_parse *main, char **av, int ac);
 int			yes_space(char c);
 int			ft_atoi(char *str);
 int			yes_int(char c);
+void		init_coders_metadata(t_parse *main, char **av);
+int			parse_scheduler(char *s, t_parse *main);
 
-// free utils
-void free_coders(t_codexion *codex);
-bool destroy_resources(t_codexion *codex, int n_mutex, int n_cond);
-// pthreads phase
-// time utils
-long	get_time_ms(void);
-// priority heap
-void classic_swap(t_waiter *linus, t_waiter *torvalds);
-void push_coder(int id, long priority, t_heap *heap);
-void remove_coder(t_heap *heap);
+/* ========== codexion_free_utils.c ========== */
+void		free_coders(t_codexion *codex);
+bool		destroy_resources(t_codexion *codex, int n_mutex, int n_cond);
+
+/* ========== codexion_init.c ========== */
+bool		coders_init(t_codexion *cdx);
+bool		dongles_init(t_codexion *cdx);
+bool		codexion_init(t_codexion **cdx, char **av, int ac);
+bool		parser_init(t_codexion *cdx, char **av, int ac);
+void		wake_coders(t_codexion *codex);
+/* ========== codexion_utils.c ========== */
+long		get_time_ms(void);
+void		coder_logs(t_codexion *codex, long timestamp, int id, char *log);
+long		choose_priority(t_coder *coder);
+bool		finished_simulation(t_codexion *codex);
+void modify_sim_status(t_codexion *codex, int status);
+void free_all(t_codexion *codex);
+/* ========== priority_queue.c ========== */
+void		classic_swap(t_waiter *linus, t_waiter *torvalds);
+void		push_coder(int id, long priority, t_heap *heap);
+void		remove_coder(t_heap *heap);
+/* ========== codexion_croutine.c ========== */
+void		take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos);
+void		take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld);
+void		put_dongle(t_codexion *codex, int dongle_pos);
+void		coders_phases(t_coder *coder, int phase);
+void		*coders_routine(void *arg);
+
+/* ========== codexion_monitor.c ========== */
+int			detect_lazy_coder(t_coder *coders);
+bool		is_done(t_coder *coders);
+void		*monitor_over_coders(void *arg);
+
+/* ========== codexion_release&catch.c ========== */
+int			release_coders(t_codexion *codex);
+void		catch_coders(t_codexion *codex, int succeeded);
+
 #endif

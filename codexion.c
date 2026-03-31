@@ -6,40 +6,30 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:08:08 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 13:50:26 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/31 15:31:06 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
+
 int	main(int ac, char **av)
 {
-	t_parse	*data;
+	t_codexion	*codexion;
 
 	if (ac != 9)
 	{
-		printf("Error: Invalid Number of Arguments\n");
+		printf("Error: Invalid Number of Arguments\nGot: %d\n", ac-1);
 		return (1);
 	}
-	data = malloc(sizeof(t_parse));
-	ft_codexion_parser(data, av, ac);
-	if (data->parse_result)
+	codexion = malloc(sizeof(t_codexion));
+	if (!codexion)
 	{
-		free(data);
+		perror("malloc");
 		return (1);
 	}
-	// pthread_t coders = 2;
-	// pthread_join(coders, NULL);
-	printf("number_of_coders: %d\n", data->number_of_coders);
-	printf("time_to_burnout: %d\n", data->time_to_burnout);
-	printf("time_to_compile: %d\n", data->time_to_compile);
-	printf("time_to_debug: %d\n", data->time_to_debug);
-	printf("time_to_refactor: %d\n", data->time_to_refactor);
-	printf("number_of_compiles_required: %d\n",
-		data->number_of_compiles_required);
-	printf("dongle_cooldown: %d\n", data->dongle_cooldown);
-	printf("scheduler: %s\n", data->scheduler);
-	printf("parse_result: %d\n", data->parse_result);
-	free(data);
+	bool a = codexion_init(&codexion, av, ac);
+	printf("%d\n", codexion->parse->number_of_coders);
+	printf("Result: %s\n", a ? "true" : "false");
+	free_all(codexion);
 }
-// ./codexion 20 1 2 89 3 7 5  edf

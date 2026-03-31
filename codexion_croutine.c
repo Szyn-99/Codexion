@@ -6,35 +6,11 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 19:07:35 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/31 12:12:14 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-int ft_strlen(char *s)
-{
-    int i = 0;
-    while(s[i])
-        i++;
-    return i;
-}
-void coder_logs(t_codexion *codex, long timestamp, int id, char *log)
-{
-    pthread_mutex_lock(&codex->log_mutex);
-    printf("%ld %d %s", timestamp, id, log);
-    pthread_mutex_unlock(&codex->log_mutex);
-}
-
-void compile_phase(t_coder *coder)
-{
-    
-}
-long choose_priority(t_coder *coder)
-{
-    if (ft_strlen(coder->sim->parse->scheduler) == 4)
-        return get_time_ms();
-    return coder->last_compile_start + coder->sim->parse->time_to_burnout;
-}
 
 void take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos)
 {
@@ -45,6 +21,12 @@ void take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos)
     push_coder(coder->id, choose_priority(coder), &usb->queue);
     while (usb->in_use || usb->queue.waiters[0].id != coder->id || get_time_ms() < usb->available_at)
     {
+        if(codex->sim_over)
+        {
+            remove_coder(&usb->queue);
+            pthread_mutex_unlock(&usb->dongle_mutex);
+            return;
+        }
         if (!usb->in_use && usb->queue.waiters[0].id == coder->id && get_time_ms() < usb->available_at)
         {
             t.tv_sec = usb->available_at / 1000;
@@ -52,7 +34,7 @@ void take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos)
             pthread_cond_timedwait(&usb->dongle_cond, &usb->dongle_mutex, &t);
         }
         else
-            pthread_cond_wait(&usb->dongle_cond, &usb->dongle_mutex);
+        pthread_cond_wait(&usb->dongle_cond, &usb->dongle_mutex);
     }
     timestamp = get_time_ms();
     remove_coder(&usb->queue);
@@ -83,17 +65,48 @@ void put_dongle(t_codexion *codex, int dongle_pos)
     pthread_mutex_unlock(&usb->dongle_mutex);
     pthread_cond_broadcast(&usb->dongle_cond);
 }
+
+void coders_phases(t_coder *coder, int phase)
+{
+    if (phase == 0x1)
+    {
+        long ms = get_time_ms();
+        coder->last_compile_start = ms;
+        coder_logs(coder->sim, ms, coder->id, "is compiling");
+        coder->compiles++;
+        usleep(coder->sim->parse->time_to_compile * 1000);
+    }
+    else if (phase == 0x2)
+    {
+        coder_logs(coder->sim, get_time_ms(), coder->id, "is debugging");
+        usleep(coder->sim->parse->time_to_debug * 1000);
+    }
+    else if (phase == 0x3)
+    {
+        coder_logs(coder->sim, get_time_ms(), coder->id, "is refactoring");
+        usleep(coder->sim->parse->time_to_refactor * 1000);
+    }
+    
+}
+
 void *coders_routine(void *arg)
 {
     t_coder *coder = (t_coder *)arg;
     int ld, rd;
     ld = coder->id - 1;
     rd = coder->id % coder->sim->parse->number_of_coders;
-    while(!coder->sim->sim_over)
+    while(!finished_simulation(coder->sim))
     {
         take_two_dongles(coder->sim, coder, rd, ld);
-        
+        if (finished_simulation(coder->sim))
+            return NULL;
+        coders_phases(coder, 0x1);
+        if (finished_simulation(coder->sim))
+            return NULL;
+        coders_phases(coder, 0x2);
+        if (finished_simulation(coder->sim))
+            return NULL;
+        coders_phases(coder, 0x3);
     }
-
-    
+    return NULL;
 }

@@ -6,25 +6,17 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 10:50:16 by szyn              #+#    #+#             */
-/*   Updated: 2026/03/30 12:23:39 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/03/31 15:31:02 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-long	get_time_ms(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);
-}
-
 bool coders_init(t_codexion *cdx)
 {
     cdx->start = get_time_ms();
     cdx->coders = malloc(sizeof(t_coder) * cdx->parse->number_of_coders);
-    if (cdx->coders)
+    if (!cdx->coders)
         return false;
     int i = 0;
     while (i < cdx->parse->number_of_coders)
@@ -56,14 +48,41 @@ bool dongles_init(t_codexion *cdx)
     }
     return true;
 }
-bool codexion_init(t_codexion *cdx)
+
+bool parser_init(t_codexion *cdx, char **av, int ac)
 {
-    if (!coders_init(cdx))
+    cdx->parse = malloc(sizeof(t_parse));
+    if(!cdx->parse)
         return false;
-    if (!dongles_init(cdx))
-        {
-            free_coders(cdx);
-            return false;
-        }
+    ft_codexion_parser(cdx->parse, av, ac);
+	if (cdx->parse->parse_result)
+	{
+		free(cdx->parse);
+		return (false);
+	}
+    return true;
+}
+void free_all(t_codexion *cdx)
+{
+    free_parser(cdx);
+    free_coders(cdx);
+    free_dongles(cdx);
+}
+bool codexion_init(t_codexion **cdx, char **av, int ac)
+{
+    if(!parser_init(*cdx, av, ac))
+        return false;
+    if (!coders_init(*cdx))
+    {
+        free_parser(*cdx);
+        return false;
+    }
+    if (!dongles_init(*cdx))
+    {
+        free_parser(*cdx);
+        free_coders(*cdx);
+        return false;
+    }
+    
     return true;
 }
