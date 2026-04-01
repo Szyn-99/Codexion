@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 19:52:05 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 21:16:35 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,13 @@ void coders_phases(t_coder *coder, int phase)
 {
     if (phase == 0x1)
     {
+        pthread_mutex_lock(&coder->sim->sim_mutex);
         long ms = get_time_ms();
         coder->last_compile_start = ms;
-        coder_logs(coder->sim, ms, coder->id, "is compiling");
         coder->compiles++;
+        pthread_mutex_unlock(&coder->sim->sim_mutex);
+        coder_logs(coder->sim, ms, coder->id, "is compiling");
+
         usleep(coder->sim->parse->time_to_compile * 1000);
     }
     else if (phase == 0x2)
@@ -101,14 +104,14 @@ void *coders_routine(void *arg)
         if (finished_simulation(coder->sim))
             return NULL;
         coders_phases(coder, 0x1);
+        put_dongle(coder->sim, ld);
+        put_dongle(coder->sim, rd);
         if (finished_simulation(coder->sim))
             return NULL;
         coders_phases(coder, 0x2);
         if (finished_simulation(coder->sim))
             return NULL;
         coders_phases(coder, 0x3);
-        put_dongle(coder->sim, ld);
-        put_dongle(coder->sim, rd);
     }
     return NULL;
 }
