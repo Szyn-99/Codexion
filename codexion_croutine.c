@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/31 12:12:14 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 19:52:05 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos)
     push_coder(coder->id, choose_priority(coder), &usb->queue);
     while (usb->in_use || usb->queue.waiters[0].id != coder->id || get_time_ms() < usb->available_at)
     {
-        if(codex->sim_over)
+        if(finished_simulation(codex))
         {
             remove_coder(&usb->queue);
             pthread_mutex_unlock(&usb->dongle_mutex);
@@ -107,6 +107,8 @@ void *coders_routine(void *arg)
         if (finished_simulation(coder->sim))
             return NULL;
         coders_phases(coder, 0x3);
+        put_dongle(coder->sim, ld);
+        put_dongle(coder->sim, rd);
     }
     return NULL;
 }

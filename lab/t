@@ -1,0 +1,144 @@
+The principal condition variable operations are signal and wait. The signal operation is a notification to one or more waiting threads that a shared variable’s state
+has changed. The wait operation is the means of blocking until such a notification
+is received.
+The pthread_cond_signal() and pthread_cond_broadcast() functions both signal
+the condition variable specified by cond. The pthread_cond_wait() function blocks a
+thread until the condition variable cond is signaled.
+644 Chapter 30
+The difference between pthread_cond_signal() and pthread_cond_broadcast() lies in
+what happens if multiple threads are blocked in pthread_cond_wait(). With
+pthread_cond_signal(), we are simply guaranteed that at least one of the blocked
+threads is woken up; with pthread_cond_broadcast(), all blocked threads are woken up.
+Using pthread_cond_broadcast() always yields correct results (since all threads
+should be programmed to handle redundant and spurious wake-ups), but
+pthread_cond_signal() can be more efficient. However, pthread_cond_signal() should
+be used only if just one of the waiting threads needs to be woken up to handle the
+change in state of the shared variable, and it doesn’t matter which one of the waiting threads is woken up. This scenario typically applies when all of the waiting
+threads are designed to perform the exactly same task. Given these assumptions,
+pthread_cond_signal() can be more efficient than pthread_cond_broadcast(), because it
+avoids the following possibility:
+1. All waiting threads are awoken.
+2. One thread is scheduled first. This thread checks the state of the shared variable(s) (under protection of the associated mutex) and sees that there is work
+to be done. The thread performs the required work, changes the state of the
+shared variable(s) to indicate that the work has been done, and unlocks the
+associated mutex.
+3. Each of the remaining threads in turn locks the mutex and tests the state of the
+shared variable. However, because of the change made by the first thread,
+these threads see that there is no work to be done, and so unlock the mutex
+and go back to sleep (i.e., call pthread_cond_wait() once more).
+By contrast, pthread_cond_broadcast() handles the case where the waiting threads are
+designed to perform different tasks (in which case they probably have different
+predicates associated with the condition variable).
+A condition variable holds no state information. It is simply a mechanism for
+communicating information about the application’s state. If no thread is waiting
+on the condition variable at the time that it is signaled, then the signal is lost. A
+thread that later waits on the condition variable will unblock only when the variable
+is signaled once more.
+The pthread_cond_timedwait() function is the same as pthread_cond_wait(),
+except that the abstime argument specifies an upper limit on the time that the
+thread will sleep while waiting for the condition variable to be signaled.
+#include <pthread.h>
+int pthread_cond_signal(pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond);
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+All return 0 on success, or a positive error number on error
+Threads: Thread Synchronization 645
+The abstime argument is a timespec structure (Section 23.4.2) specifying an absolute time expressed as seconds and nanoseconds since the Epoch (Section 10.1). If
+the time interval specified by abstime expires without the condition variable being
+signaled, then pthread_cond_timedwait() returns the error ETIMEDOUT.
+Using a condition variable in the producer-consumer example
+Let’s revise our previous example to use a condition variable. The declarations of
+our global variable and associated mutex and condition variable are as follows:
+static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+static int avail = 0;
+The code segments shown in this section can be found in the file threads/
+prod_condvar.c in the source code distribution for this book.
+The code in the producer threads is the same as before, except that we add a call to
+pthread_cond_signal():
+s = pthread_mutex_lock(&mtx);
+if (s != 0)
+ errExitEN(s, "pthread_mutex_lock");
+avail++; /* Let consumer know another unit is available */
+s = pthread_mutex_unlock(&mtx);
+if (s != 0)
+ errExitEN(s, "pthread_mutex_unlock");
+s = pthread_cond_signal(&cond); /* Wake sleeping consumer */
+if (s != 0)
+ errExitEN(s, "pthread_cond_signal");
+Before considering the code of the consumer, we need to explain
+pthread_cond_wait() in greater detail. We noted earlier that a condition variable
+always has an associated mutex. Both of these objects are passed as arguments to
+pthread_cond_wait(), which performs the following steps:
+z unlock the mutex specified by mutex;
+z block the calling thread until another thread signals the condition variable
+cond; and
+z relock mutex.
+#include <pthread.h>
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
+ const struct timespec *abstime);
+Returns 0 on success, or a positive error number on error
+646 Chapter 30
+The pthread_cond_wait() function is designed to perform these steps because, normally,
+we access a shared variable in the following manner:
+s = pthread_mutex_lock(&mtx);
+if (s != 0)
+ errExitEN(s, "pthread_mutex_lock");
+while (/* Check that shared variable is not in state we want */)
+ pthread_cond_wait(&cond, &mtx);
+/* Now shared variable is in desired state; do some work */
+s = pthread_mutex_unlock(&mtx);
+if (s != 0)
+ errExitEN(s, "pthread_mutex_unlock");
+(We explain why the pthread_cond_wait() call is placed within a while loop rather
+than an if statement in the next section.)
+In the above code, both accesses to the shared variable must be mutex-protected
+for the reasons that we explained earlier. In other words, there is a natural association of a mutex with a condition variable:
+1. The thread locks the mutex in preparation for checking the state of the shared
+variable.
+2. The state of the shared variable is checked.
+3. If the shared variable is not in the desired state, then the thread must unlock
+the mutex (so that other threads can access the shared variable) before it goes
+to sleep on the condition variable.
+4. When the thread is reawakened because the condition variable has been signaled, the mutex must once more be locked, since, typically, the thread then
+immediately accesses the shared variable.
+The pthread_cond_wait() function automatically performs the mutex unlocking and
+locking required in the last two of these steps. In the third step, releasing the
+mutex and blocking on the condition variable are performed atomically. In other
+words, it is not possible for some other thread to acquire the mutex and signal
+the condition variable before the thread calling pthread_cond_wait() has blocked
+on the condition variable.
+There is a corollary to the observation that there is a natural relationship between
+a condition variable and a mutex: all threads that concurrently wait on a particular
+condition variable must specify the same mutex in their pthread_cond_wait() (or
+pthread_cond_timedwait()) calls. In effect, a pthread_cond_wait() call dynamically
+binds a condition variable to a unique mutex for the duration of the call.
+SUSv3 notes that the result of using more than one mutex for concurrent
+pthread_cond_wait() calls on the same condition variable is undefined.
+Threads: Thread Synchronization 647
+Putting the above details together, we can now modify the main (consumer) thread
+to use pthread_cond_wait(), as follows:
+for (;;) {
+ s = pthread_mutex_lock(&mtx);
+ if (s != 0)
+ errExitEN(s, "pthread_mutex_lock");
+ while (avail == 0) { /* Wait for something to consume */
+ s = pthread_cond_wait(&cond, &mtx);
+ if (s != 0)
+ errExitEN(s, "pthread_cond_wait");
+ }
+ while (avail > 0) { /* Consume all available units */
+ /* Do something with produced unit */
+ avail--;
+ }
+ s = pthread_mutex_unlock(&mtx);
+if (s != 0)
+ errExitEN(s, "pthread_mutex_unlock");
+/* Perhaps do other work here that doesn't require mutex lock */
+}
+We conclude with one final observation about the use of pthread_cond_signal()
+(and pthread_cond_broadcast()). In the producer code shown earlier, we called
+pthread_mutex_unlock(), and then called pthread_cond_signal(); that is, we first unlocked
+the mutex associated with the shared variable, and then signaled the corresponding
+condition variable. We could have reversed these two steps; SUSv3 permits them to
+be done in either order.

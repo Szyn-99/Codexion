@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:30:19 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/31 15:18:09 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 20:06:00 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int release_coders(t_codexion *codex)
     int check;
     while (i < codex->parse->number_of_coders)
     {
-        check = pthread_create(&codex->coders[i].thread, NULL, coders_routine, codex->coders);
+        check = pthread_create(&codex->coders[i].thread, NULL, coders_routine, &codex->coders[i]);
         if (check)
         {
             modify_sim_status(codex, 1);
@@ -47,4 +47,5 @@ void catch_coders(t_codexion *codex, int succeeded)
         pthread_join(codex->coders[i].thread, NULL);
         i++;
     }
+    pthread_join(codex->monitor, NULL);
 }

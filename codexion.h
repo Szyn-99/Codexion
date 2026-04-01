@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/31 15:31:10 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 19:32:30 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,9 @@ int			yes_int(char c);
 void		init_coders_metadata(t_parse *main, char **av);
 int			parse_scheduler(char *s, t_parse *main);
 
+/* ========== codexion.c ========== */
+int			exit_error(char *message);
+
 /* ========== codexion_free_utils.c ========== */
 void		free_coders(t_codexion *codex);
 bool		destroy_resources(t_codexion *codex, int n_mutex, int n_cond);
@@ -123,8 +126,8 @@ int			detect_lazy_coder(t_coder *coders);
 bool		is_done(t_coder *coders);
 void		*monitor_over_coders(void *arg);
 
-/* ========== codexion_release&catch.c ========== */
+/* ========== codexion_release_catch.c ========== */
 int			release_coders(t_codexion *codex);
+bool		release_monitor(t_codexion *codex);
 void		catch_coders(t_codexion *codex, int succeeded);
-
 #endif

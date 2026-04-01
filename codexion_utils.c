@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:05:00 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/31 12:54:26 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 20:07:37 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,13 @@ long choose_priority(t_coder *coder)
 
 void coder_logs(t_codexion *codex, long timestamp, int id, char *log)
 {
+    long elapsed;
+
+    elapsed = timestamp - codex->start;
+    if (elapsed < 0)
+        elapsed = 0;
     pthread_mutex_lock(&codex->log_mutex);
-    printf("%ld %d %s\n", timestamp, id, log);
+    printf("%ld %d %s\n", elapsed, id, log);
     pthread_mutex_unlock(&codex->log_mutex);
 }
 

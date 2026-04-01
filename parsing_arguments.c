@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:06:56 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/30 12:05:16 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 19:52:37 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	ft_atoi(char *str)
 		else if (((result * 10) + (str[i] - '0')) > 2147483647)
 			return (-42);
 		else if (yes_int(str[i]))
-			result += (result * 10) + (str[i] - '0');
+			result = (result * 10) + (str[i] - '0');
 		else
 			return (-42);
 		i++;

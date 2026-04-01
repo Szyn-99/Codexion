@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 10:50:16 by szyn              #+#    #+#             */
-/*   Updated: 2026/03/31 15:31:02 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 19:54:16 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,19 +70,24 @@ void free_all(t_codexion *cdx)
 }
 bool codexion_init(t_codexion **cdx, char **av, int ac)
 {
+    *cdx = malloc(sizeof(t_codexion));
     if(!parser_init(*cdx, av, ac))
-        return false;
+        return free(*cdx), false;
     if (!coders_init(*cdx))
     {
         free_parser(*cdx);
+        free(*cdx);
         return false;
     }
     if (!dongles_init(*cdx))
     {
         free_parser(*cdx);
         free_coders(*cdx);
+        free(*cdx);
         return false;
     }
+    pthread_mutex_init(&(*cdx)->sim_mutex, NULL);
+    pthread_mutex_init(&(*cdx)->log_mutex, NULL);
     
     return true;
 }

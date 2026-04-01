@@ -6,7 +6,7 @@
 /*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/03/31 14:18:28 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/01 20:05:59 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ bool is_done(t_coder *coders)
     int i = 0;
     while (i < coders->sim->parse->number_of_coders)
     {
-        if(coders[i].compiles != coders->sim->parse->number_of_compiles_required)
+        if (coders[i].compiles < coders->sim->parse->number_of_compiles_required)
             return false;
+        i++;
     }
     return true;
 }
@@ -54,6 +55,7 @@ void *monitor_over_coders(void *arg)
         lazy = detect_lazy_coder(codex->coders);
         if (lazy != -42)
         {
+            
             modify_sim_status(codex, 1);
             wake_coders(codex);
             coder_logs(codex, get_time_ms(), lazy, "burned out");
@@ -65,6 +67,7 @@ void *monitor_over_coders(void *arg)
             wake_coders(codex);
             return NULL;
         }
+        usleep(500);
     }
     return NULL;
 }
