@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:05:00 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 20:07:37 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 10:53:22 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,14 @@ void coder_logs(t_codexion *codex, long timestamp, int id, char *log)
     if (elapsed < 0)
         elapsed = 0;
     pthread_mutex_lock(&codex->log_mutex);
-    printf("%ld %d %s\n", elapsed, id, log);
+    if (!finished_simulation(codex) || log[0] == 'b')
+        printf("%ld %d %s\n", elapsed, id, log);
     pthread_mutex_unlock(&codex->log_mutex);
 }
 
-bool finished_simulation(t_codexion *codex)
+int finished_simulation(t_codexion *codex)
 {
-    bool finished;
+    int finished;
     pthread_mutex_lock(&codex->sim_mutex);
     finished = codex->sim_over;
     pthread_mutex_unlock(&codex->sim_mutex);

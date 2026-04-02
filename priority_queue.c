@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   priority_queue.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/22 09:44:16 by szyn              #+#    #+#             */
-/*   Updated: 2026/03/30 15:43:55 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 09:51:18 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void push_coder(int id, long priority, t_heap *heap)
 
 void remove_coder(t_heap *heap)
 {
-    heap->waiters[0] = heap->waiters[1];
+    if(heap->size == 2)
+        heap->waiters[0] = heap->waiters[1];
     heap->size--; 
 }

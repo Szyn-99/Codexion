@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 19:32:30 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 10:41:55 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void		wake_coders(t_codexion *codex);
 long		get_time_ms(void);
 void		coder_logs(t_codexion *codex, long timestamp, int id, char *log);
 long		choose_priority(t_coder *coder);
-bool		finished_simulation(t_codexion *codex);
+int		finished_simulation(t_codexion *codex);
 void modify_sim_status(t_codexion *codex, int status);
 void free_all(t_codexion *codex);
 /* ========== priority_queue.c ========== */
@@ -122,8 +122,8 @@ void		coders_phases(t_coder *coder, int phase);
 void		*coders_routine(void *arg);
 
 /* ========== codexion_monitor.c ========== */
-int			detect_lazy_coder(t_coder *coders);
-bool		is_done(t_coder *coders);
+int			detect_lazy_coder(t_codexion *codex);
+bool		is_done(t_codexion *codex);
 void		*monitor_over_coders(void *arg);
 
 /* ========== codexion_release_catch.c ========== */

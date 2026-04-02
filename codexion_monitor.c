@@ -3,38 +3,52 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_monitor.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 20:05:59 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 10:53:00 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
 
-int detect_lazy_coder(t_coder *coders)
+int	detect_lazy_coder(t_codexion *codex)
 {
-    long criteria = get_time_ms();
-    int i = 0;
-    while(i < coders->sim->parse->number_of_coders)
-    {
-        if (coders[i].last_compile_start + coders->sim->parse->time_to_burnout <= criteria)
-            return coders[i].id;
-        i++;
-    }
-    return -42;
+	long	criteria;
+	long	last;
+	int		i;
+
+	i = 0;
+	while (i < codex->parse->number_of_coders)
+	{
+		criteria = get_time_ms();
+		pthread_mutex_lock(&codex->sim_mutex);
+		last = codex->coders[i].last_compile_start;
+		pthread_mutex_unlock(&codex->sim_mutex);
+		if (last + codex->parse->time_to_burnout < criteria)
+			return (codex->coders[i].id);
+		i++;
+	}
+	return (-42);
 }
-bool is_done(t_coder *coders)
+
+bool	is_done(t_codexion *codex)
 {
-    int i = 0;
-    while (i < coders->sim->parse->number_of_coders)
-    {
-        if (coders[i].compiles < coders->sim->parse->number_of_compiles_required)
-            return false;
-        i++;
-    }
-    return true;
+	int	compiles;
+	int	i;
+
+	i = 0;
+	while (i < codex->parse->number_of_coders)
+	{
+		pthread_mutex_lock(&codex->sim_mutex);
+		compiles = codex->coders[i].compiles;
+		pthread_mutex_unlock(&codex->sim_mutex);
+		if (compiles < codex->parse->number_of_compiles_required)
+			return (false);
+		i++;
+	}
+	return (true);
 }
 
 void wake_coders(t_codexion *codex)
@@ -46,28 +60,29 @@ void wake_coders(t_codexion *codex)
         i++;
     }
 }
-void *monitor_over_coders(void *arg)
+void	*monitor_over_coders(void *arg)
 {
-    t_codexion *codex = (t_codexion *)arg;
-    int lazy;
-    while(!finished_simulation(codex))
-    {
-        lazy = detect_lazy_coder(codex->coders);
-        if (lazy != -42)
-        {
-            
-            modify_sim_status(codex, 1);
-            wake_coders(codex);
-            coder_logs(codex, get_time_ms(), lazy, "burned out");
-            return NULL;
-        }
-        if (is_done(codex->coders))
-        {
-            modify_sim_status(codex, 1);
-            wake_coders(codex);
-            return NULL;
-        }
-        usleep(500);
-    }
-    return NULL;
+	t_codexion	*codex;
+	int			lazy;
+
+	codex = (t_codexion *)arg;
+	while (!finished_simulation(codex))
+	{
+		lazy = detect_lazy_coder(codex);
+		if (lazy != -42)
+		{
+			modify_sim_status(codex, 1);
+			coder_logs(codex, get_time_ms(), lazy, "burned out");
+			wake_coders(codex);
+			return (NULL);
+		}
+		if (is_done(codex))
+		{
+			modify_sim_status(codex, 1);
+			wake_coders(codex);
+			return (NULL);
+		}
+		usleep(500);
+	}
+	return (NULL);
 }

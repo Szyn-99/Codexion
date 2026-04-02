@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_croutine.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 21:16:35 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 11:08:59 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,15 @@ void take_dongle(t_codexion *codex, t_coder *coder, int dongle_pos)
 
 void take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
 {
-    if (ld < rd)
+    if (coder->id % 2 == 1)
     {
-        take_dongle(codex, coder, ld);
         take_dongle(codex, coder, rd);
+        take_dongle(codex, coder, ld);
     }
     else
     {
-        take_dongle(codex, coder, rd);
         take_dongle(codex, coder, ld);
+        take_dongle(codex, coder, rd);
     }
 }
 void put_dongle(t_codexion *codex, int dongle_pos)
@@ -92,26 +92,42 @@ void coders_phases(t_coder *coder, int phase)
     
 }
 
-void *coders_routine(void *arg)
+void	*coders_routine(void *arg)
 {
-    t_coder *coder = (t_coder *)arg;
-    int ld, rd;
-    ld = coder->id - 1;
-    rd = coder->id % coder->sim->parse->number_of_coders;
-    while(!finished_simulation(coder->sim))
-    {
-        take_two_dongles(coder->sim, coder, rd, ld);
-        if (finished_simulation(coder->sim))
-            return NULL;
-        coders_phases(coder, 0x1);
-        put_dongle(coder->sim, ld);
-        put_dongle(coder->sim, rd);
-        if (finished_simulation(coder->sim))
-            return NULL;
-        coders_phases(coder, 0x2);
-        if (finished_simulation(coder->sim))
-            return NULL;
-        coders_phases(coder, 0x3);
-    }
-    return NULL;
+	t_coder	*coder;
+	int		ld;
+	int		rd;
+
+	coder = (t_coder *)arg;
+	if (coder->sim->parse->number_of_coders == 1)
+	{
+		while (!finished_simulation(coder->sim))
+			usleep(1000);
+		return (NULL);
+	}
+
+	ld = coder->id - 1;
+	rd = coder->id % coder->sim->parse->number_of_coders;
+	if (coder->id % 2 == 0)
+		usleep(1000);
+	while (!finished_simulation(coder->sim))
+	{
+		take_two_dongles(coder->sim, coder, rd, ld);
+		if (finished_simulation(coder->sim))
+		{
+			put_dongle(coder->sim, ld);
+			put_dongle(coder->sim, rd);
+			return (NULL);
+		}
+		coders_phases(coder, 0x1);
+		put_dongle(coder->sim, ld);
+		put_dongle(coder->sim, rd);
+		if (finished_simulation(coder->sim))
+			return (NULL);
+		coders_phases(coder, 0x2);
+		if (finished_simulation(coder->sim))
+			return (NULL);
+		coders_phases(coder, 0x3);
+	}
+	return (NULL);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_arguments.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:06:56 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/01 19:52:37 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/02 10:43:49 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,24 +25,29 @@ int	yes_int(char c)
 int	ft_atoi(char *str)
 {
 	int		i;
-	int		space_length;
+	int		has_digit;
 	long	result;
 
 	i = 0;
-	space_length = 0;
+	has_digit = 0;
 	result = 0;
 	while (str[i] != '\0')
 	{
 		if (yes_space(str[i]))
-			space_length++;
-		else if (((result * 10) + (str[i] - '0')) > 2147483647)
-			return (-42);
+			;
 		else if (yes_int(str[i]))
+		{
+			if (((result * 10) + (str[i] - '0')) > 2147483647)
+				return (-42);
 			result = (result * 10) + (str[i] - '0');
+			has_digit = 1;
+		}
 		else
 			return (-42);
 		i++;
 	}
+	if (!has_digit)
+		return (-42);
 	return (result);
 }
 
@@ -84,7 +89,7 @@ void	ft_codexion_parser(t_parse *main, char **av, int ac)
 	{
 		return ;
 	}
-	while (j < ac - 2)
+	while (j < ac - 1)
 	{
 		if (ft_atoi(av[j]) == -42)
 		{
