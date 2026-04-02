@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_croutine.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/02 11:08:59 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/02 14:38:11 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ void put_dongle(t_codexion *codex, int dongle_pos)
     pthread_mutex_lock(&usb->dongle_mutex);
     usb->in_use = 0;
     usb->available_at = get_time_ms() + codex->parse->dongle_cooldown;
-    pthread_mutex_unlock(&usb->dongle_mutex);
     pthread_cond_broadcast(&usb->dongle_cond);
+    pthread_mutex_unlock(&usb->dongle_mutex);
 }
 
 void coders_phases(t_coder *coder, int phase)

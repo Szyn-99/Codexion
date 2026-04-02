@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_monitor.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/02 10:53:00 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/02 14:41:13 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ void wake_coders(t_codexion *codex)
     int i = 0;
     while(i < codex->parse->number_of_dongles)
     {
+		pthread_mutex_lock(&codex->dongles[i].dongle_mutex);
         pthread_cond_broadcast(&codex->dongles[i].dongle_cond);
+		pthread_mutex_unlock(&codex->dongles[i].dongle_mutex);
         i++;
     }
 }
