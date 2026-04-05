@@ -12,37 +12,73 @@
 
 #include "codexion.h"
 
-static int	both_free(t_dongle *a, t_dongle *b, int id)
+static int	check_ready(t_dongle *d, int id)
 {
 	long	now;
 
 	now = get_time_ms();
-	return (!a->in_use && !b->in_use
-		&& a->queue.waiters[0].id == id
-		&& b->queue.waiters[0].id == id
-		&& now >= a->available_at
-		&& now >= b->available_at);
+	return (!d->in_use && d->queue.waiters[0].id == id
+		&& now >= d->available_at);
+}
+
+static void	wait_on_cond(t_dongle *d, int id)
+{
+	struct timespec	ts;
+	struct timeval	tv;
+	long			wait_ms;
+	long			now;
+
+	now = get_time_ms();
+	wait_ms = 5;
+	if (!d->in_use && d->queue.waiters[0].id == id && now < d->available_at)
+	{
+		wait_ms = d->available_at - now;
+		if (wait_ms > 10)
+			wait_ms = 10;
+		else if (wait_ms <= 0)
+			wait_ms = 1;
+	}
+	gettimeofday(&tv, NULL);
+	ts.tv_sec = tv.tv_sec + (tv.tv_usec + wait_ms * 1000) / 1000000;
+	ts.tv_nsec = ((tv.tv_usec + wait_ms * 1000) % 1000000) * 1000;
+	pthread_cond_timedwait(&d->dongle_cond, &d->dongle_mutex, &ts);
 }
 
 static void	wait_for_pair(t_dongle *a, t_dongle *b, int id, t_codexion *cdx)
 {
-	while (!both_free(a, b, id) && !finished_simulation(cdx))
+	int	a_r;
+	int	b_r;
+
+	while (!finished_simulation(cdx))
 	{
-		pthread_mutex_unlock(&b->dongle_mutex);
-		pthread_mutex_unlock(&a->dongle_mutex);
-		usleep(100);
-		pthread_mutex_lock(&a->dongle_mutex);
-		pthread_mutex_lock(&b->dongle_mutex);
+		a_r = check_ready(a, id);
+		b_r = check_ready(b, id);
+		if (a_r && b_r)
+			break ;
+		if (!a_r)
+		{
+			pthread_mutex_unlock(&b->dongle_mutex);
+			wait_on_cond(a, id);
+			pthread_mutex_lock(&b->dongle_mutex);
+		}
+		else
+		{
+			pthread_mutex_unlock(&a->dongle_mutex);
+			wait_on_cond(b, id);
+			pthread_mutex_unlock(&b->dongle_mutex);
+			pthread_mutex_lock(&a->dongle_mutex);
+			pthread_mutex_lock(&b->dongle_mutex);
+		}
 	}
 }
 
-void	take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
+int	take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
 {
 	t_dongle	*a;
 	t_dongle	*b;
 	int			got;
 	long		now;
-
+	
 	a = &codex->dongles[(ld < rd) * ld + (ld >= rd) * rd];
 	b = &codex->dongles[(ld < rd) * rd + (ld >= rd) * ld];
 	pthread_mutex_lock(&a->dongle_mutex);
@@ -63,6 +99,7 @@ void	take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
 		coder_logs(codex, now, coder->id, "has taken a dongle");
 		coder_logs(codex, now, coder->id, "has taken a dongle");
 	}
+	return (got);
 }
 
 void	put_dongle(t_codexion *codex, int dongle_pos)
@@ -73,6 +110,7 @@ void	put_dongle(t_codexion *codex, int dongle_pos)
 	pthread_mutex_lock(&usb->dongle_mutex);
 	usb->in_use = 0;
 	usb->available_at = get_time_ms() + codex->parse->dongle_cooldown;
+	pthread_cond_broadcast(&usb->dongle_cond);
 	pthread_mutex_unlock(&usb->dongle_mutex);
 }
 
@@ -104,13 +142,8 @@ void	coders_phases(t_coder *coder, int phase)
 
 static int	run_cycle(t_coder *coder, int rd, int ld)
 {
-	take_two_dongles(coder->sim, coder, rd, ld);
-	if (finished_simulation(coder->sim))
-	{
-		put_dongle(coder->sim, ld);
-		put_dongle(coder->sim, rd);
+	if (!take_two_dongles(coder->sim, coder, rd, ld))
 		return (0);
-	}
 	coders_phases(coder, 0x1);
 	put_dongle(coder->sim, ld);
 	put_dongle(coder->sim, rd);

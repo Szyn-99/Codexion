@@ -115,7 +115,7 @@ void		classic_swap(t_waiter *linus, t_waiter *torvalds);
 void		push_coder(int id, long priority, t_heap *heap);
 void		remove_coder(t_heap *heap);
 /* ========== codexion_croutine.c ========== */
-void		take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld);
+int			take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld);
 void		put_dongle(t_codexion *codex, int dongle_pos);
 void		coders_phases(t_coder *coder, int phase);
 void		*coders_routine(void *arg);
