@@ -29,19 +29,19 @@ static void	wait_on_cond(t_dongle *d, int id)
 	long			now;
 
 	now = get_time_ms();
-	wait_ms = 5;
-	if (!d->in_use && d->queue.waiters[0].id == id && now < d->available_at)
+	
+	if (!d->in_use && d->queue.waiters[0].id == id)
 	{
 		wait_ms = d->available_at - now;
-		if (wait_ms > 10)
-			wait_ms = 10;
-		else if (wait_ms <= 0)
-			wait_ms = 1;
+		if (wait_ms <= 0)
+			return ;
+		gettimeofday(&tv, NULL);
+		ts.tv_sec = tv.tv_sec + (tv.tv_usec + wait_ms * 1000) / 1000000;
+		ts.tv_nsec = ((tv.tv_usec + wait_ms * 1000) % 1000000) * 1000;
+		pthread_cond_timedwait(&d->dongle_cond, &d->dongle_mutex, &ts);
 	}
-	gettimeofday(&tv, NULL);
-	ts.tv_sec = tv.tv_sec + (tv.tv_usec + wait_ms * 1000) / 1000000;
-	ts.tv_nsec = ((tv.tv_usec + wait_ms * 1000) % 1000000) * 1000;
-	pthread_cond_timedwait(&d->dongle_cond, &d->dongle_mutex, &ts);
+	else
+		pthread_cond_wait(&d->dongle_cond, &d->dongle_mutex);
 }
 
 static void	wait_for_pair(t_dongle *a, t_dongle *b, int id, t_codexion *cdx)
