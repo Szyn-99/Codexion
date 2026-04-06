@@ -72,15 +72,15 @@ static void	wait_for_pair(t_dongle *a, t_dongle *b, int id, t_codexion *cdx)
 	}
 }
 
-int	take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
+int	take_two_dongles(t_codexion *codex, t_coder *coder)
 {
 	t_dongle	*a;
 	t_dongle	*b;
 	int			got;
 	long		now;
 	
-	a = &codex->dongles[(ld < rd) * ld + (ld >= rd) * rd];
-	b = &codex->dongles[(ld < rd) * rd + (ld >= rd) * ld];
+	a = coder->d1;
+	b = coder->d2;
 	pthread_mutex_lock(&a->dongle_mutex);
 	pthread_mutex_lock(&b->dongle_mutex);
 	push_coder(coder->id, choose_priority(coder), &a->queue);
@@ -102,11 +102,8 @@ int	take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld)
 	return (got);
 }
 
-void	put_dongle(t_codexion *codex, int dongle_pos)
+void	put_dongle(t_dongle *usb, t_codexion *codex)
 {
-	t_dongle	*usb;
-
-	usb = &codex->dongles[dongle_pos];
 	pthread_mutex_lock(&usb->dongle_mutex);
 	usb->in_use = 0;
 	usb->available_at = get_time_ms() + codex->parse->dongle_cooldown;
@@ -140,13 +137,13 @@ void	coders_phases(t_coder *coder, int phase)
 	}
 }
 
-static int	run_cycle(t_coder *coder, int rd, int ld)
+static int	run_cycle(t_coder *coder)
 {
-	if (!take_two_dongles(coder->sim, coder, rd, ld))
+	if (!take_two_dongles(coder->sim, coder))
 		return (0);
 	coders_phases(coder, 0x1);
-	put_dongle(coder->sim, ld);
-	put_dongle(coder->sim, rd);
+	put_dongle(coder->d1, coder->sim);
+	put_dongle(coder->d2, coder->sim);
 	if (finished_simulation(coder->sim))
 		return (0);
 	coders_phases(coder, 0x2);
@@ -159,8 +156,6 @@ static int	run_cycle(t_coder *coder, int rd, int ld)
 void	*coders_routine(void *arg)
 {
 	t_coder	*coder;
-	int		ld;
-	int		rd;
 	int		n;
 
 	coder = (t_coder *)arg;
@@ -171,8 +166,6 @@ void	*coders_routine(void *arg)
 			usleep(1000);
 		return (NULL);
 	}
-	ld = coder->id - 1;
-	rd = coder->id % n;
 	if (coder->id % 2 == 0)
 		usleep((coder->sim->parse->time_to_compile
 				+ coder->sim->parse->dongle_cooldown) * 1000);
@@ -180,7 +173,7 @@ void	*coders_routine(void *arg)
 		usleep(2 * (coder->sim->parse->time_to_compile
 				+ coder->sim->parse->dongle_cooldown) * 1000);
 	while (!finished_simulation(coder->sim))
-		if (!run_cycle(coder, rd, ld))
+		if (!run_cycle(coder))
 			break ;
 	return (NULL);
 }

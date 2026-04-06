@@ -18,12 +18,26 @@ bool coders_init(t_codexion *cdx)
     if (!cdx->coders)
         return false;
     int i = 0;
+    int	ld;
+    int	rd;
     while (i < cdx->parse->number_of_coders)
     {
         cdx->coders[i].id = i + 1;
         cdx->coders[i].last_compile_start = 0;
         cdx->coders[i].compiles = 0;
         cdx->coders[i].sim = cdx;
+        ld = i;
+        rd = (i + 1) % cdx->parse->number_of_coders;
+        if (ld < rd)
+        {
+            cdx->coders[i].d1 = &cdx->dongles[ld];
+            cdx->coders[i].d2 = &cdx->dongles[rd];
+        }
+        else
+        {
+            cdx->coders[i].d1 = &cdx->dongles[rd];
+            cdx->coders[i].d2 = &cdx->dongles[ld];
+        }
         i++;     
     }
     return true;
@@ -74,17 +88,16 @@ bool	codexion_init(t_codexion **cdx, char **av, int ac)
 		return (false);
 	if (!parser_init(*cdx, av, ac))
 		return (free(*cdx), false);
-	if (!coders_init(*cdx))
+	if (!dongles_init(*cdx))
 	{
 		free_parser(*cdx);
 		free(*cdx);
 		return (false);
 	}
-	if (!dongles_init(*cdx))
+	if (!coders_init(*cdx))
 	{
-		free((*cdx)->dongles);
+		free_dongles(*cdx);
 		free_parser(*cdx);
-		free_coders(*cdx);
 		free(*cdx);
 		return (false);
 	}

@@ -64,6 +64,8 @@ struct s_coder
 {
 	pthread_t		thread;
 	t_codexion		*sim;
+	t_dongle		*d1;
+	t_dongle		*d2;
 	long			last_compile_start;
 	int				id;
 	int				compiles;
@@ -115,8 +117,8 @@ void		classic_swap(t_waiter *linus, t_waiter *torvalds);
 void		push_coder(int id, long priority, t_heap *heap);
 void		remove_coder(t_heap *heap);
 /* ========== codexion_croutine.c ========== */
-int			take_two_dongles(t_codexion *codex, t_coder *coder, int rd, int ld);
-void		put_dongle(t_codexion *codex, int dongle_pos);
+int			take_two_dongles(t_codexion *codex, t_coder *coder);
+void		put_dongle(t_dongle *usb, t_codexion *codex);
 void		coders_phases(t_coder *coder, int phase);
 void		*coders_routine(void *arg);
 
