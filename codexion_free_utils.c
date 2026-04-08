@@ -20,16 +20,16 @@ void free_coders(t_codexion *codex)
 }
 void free_dongles(t_codexion *codex)
 {
-    if (codex && codex->dongles)
+    if (codex && codex->usbs)
     {
         int i = 0;
-        while(i < codex->parse->number_of_dongles)
+        while(i < codex->parse->n_dongles)
         {
-            pthread_mutex_destroy(&codex->dongles[i].dongle_mutex);
-            pthread_cond_destroy(&codex->dongles[i].dongle_cond);
+            pthread_mutex_destroy(&codex->usbs[i].usb_mutex);
+            pthread_cond_destroy(&codex->usbs[i].usb_cond);
             i++;
         }
-        free(codex->dongles);
+        free(codex->usbs);
     }
 }
 
@@ -44,13 +44,13 @@ bool destroy_resources(t_codexion *codex, int n_mutex, int n_cond)
     int i = 0;
     while (i < n_mutex)
     {
-        pthread_mutex_destroy(&codex->dongles[i].dongle_mutex);
+        pthread_mutex_destroy(&codex->usbs[i].usb_mutex);
         i++;
     }
     i = 0;
     while (i < n_cond)
     {
-        pthread_cond_destroy(&codex->dongles[i].dongle_cond);
+        pthread_cond_destroy(&codex->usbs[i].usb_cond);
         i++;
     }
     return false;

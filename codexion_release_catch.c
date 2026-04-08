@@ -17,11 +17,11 @@ int	release_coders(t_codexion *codex)
 	int	i;
 	int	check;
 
-	codex->start = get_time_ms();
+	codex->start_time = get_time_ms();
 	i = 0;
-	while (i < codex->parse->number_of_coders)
+	while (i < codex->parse->n_coders)
 	{
-		codex->coders[i].last_compile_start = codex->start;
+		codex->coders[i].last_compile_start = codex->start_time;
 		check = pthread_create(&codex->coders[i].thread, NULL,
 				coders_routine, &codex->coders[i]);
 		if (check)

@@ -13,24 +13,24 @@
 #ifndef CODEXION_H
 # define CODEXION_H
 # include <pthread.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdbool.h>
-#include <sys/time.h>
+# include <stdio.h>
+# include <sys/time.h>
 
-#define PARENT_POS(x) (((x) - 1) / 2)
+
 
 typedef struct s_parse
 {
-	int		number_of_coders;
-	int		number_of_dongles;
-	int		time_to_burnout;
-	int		time_to_compile;
-	int		time_to_debug;
-	int		time_to_refactor;
-	int		number_of_compiles_required;
-	int		dongle_cooldown;
+	int		n_coders;
+	int		n_dongles;
+	int		t_burnout;
+	int		t_compile;
+	int		t_debug;
+	int		t_refactor;
+	int		n_compiles;
+	int		dt_cooldown;
 	int		parse_result;
 	char	*scheduler;
 }			t_parse;
@@ -47,14 +47,14 @@ typedef struct s_heap
 	int			size;
 }	t_heap;
 
-typedef struct s_dongle
+typedef struct s_usb
 {
 	t_heap			queue;
-	pthread_mutex_t	dongle_mutex;
-	pthread_cond_t	dongle_cond;
-	long			available_at;
-	int				in_use;
-}	t_dongle;
+	pthread_mutex_t	usb_mutex;
+	pthread_cond_t	usb_cond;
+	long			served_at;
+	int				free;
+}	t_usb;
 
 typedef struct s_coder t_coder;
 typedef struct s_codexion t_codexion;
@@ -63,24 +63,24 @@ void free_parser(t_codexion *codex);
 struct s_coder
 {
 	pthread_t		thread;
-	t_codexion		*sim;
-	t_dongle		*d1;
-	t_dongle		*d2;
+	t_codexion		*codexion;
+	t_usb			*lowest_usb;
+	t_usb			*highest_usb;
 	long			last_compile_start;
 	int				id;
-	int				compiles;
+	int				compiles_done;
 };
 void free_dongles(t_codexion *codex);
 struct s_codexion
 {
-	t_dongle		*dongles;
+	t_usb			*usbs;
 	t_coder			*coders;
 	t_parse			*parse;
 	pthread_t		monitor;
 	pthread_mutex_t	log_mutex;
-	pthread_mutex_t	sim_mutex;
-	int				sim_over;
-	long			start;
+	pthread_mutex_t	codex_mutex;
+	int				codex_over;
+	long			start_time;
 }	;
 
 
@@ -118,7 +118,7 @@ void		push_coder(int id, long priority, t_heap *heap);
 void		remove_coder(t_heap *heap);
 /* ========== codexion_croutine.c ========== */
 int			take_two_dongles(t_codexion *codex, t_coder *coder);
-void		put_dongle(t_dongle *usb, t_codexion *codex);
+void		put_dongle(t_usb *usb, t_codexion *codex);
 void		coders_phases(t_coder *coder, int phase);
 void		*coders_routine(void *arg);
 

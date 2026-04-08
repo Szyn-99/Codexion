@@ -20,13 +20,13 @@ int	detect_lazy_coder(t_codexion *codex)
 	int		i;
 
 	i = 0;
-	while (i < codex->parse->number_of_coders)
+	while (i < codex->parse->n_coders)
 	{
 		criteria = get_time_ms();
-		pthread_mutex_lock(&codex->sim_mutex);
+		pthread_mutex_lock(&codex->codex_mutex);
 		last = codex->coders[i].last_compile_start;
-		pthread_mutex_unlock(&codex->sim_mutex);
-		if (last + codex->parse->time_to_burnout < criteria)
+		pthread_mutex_unlock(&codex->codex_mutex);
+		if (last + codex->parse->t_burnout < criteria)
 			return (codex->coders[i].id);
 		i++;
 	}
@@ -39,12 +39,12 @@ bool	is_done(t_codexion *codex)
 	int	i;
 
 	i = 0;
-	while (i < codex->parse->number_of_coders)
+	while (i < codex->parse->n_coders)
 	{
-		pthread_mutex_lock(&codex->sim_mutex);
-		compiles = codex->coders[i].compiles;
-		pthread_mutex_unlock(&codex->sim_mutex);
-		if (compiles < codex->parse->number_of_compiles_required)
+		pthread_mutex_lock(&codex->codex_mutex);
+		compiles = codex->coders[i].compiles_done;
+		pthread_mutex_unlock(&codex->codex_mutex);
+		if (compiles < codex->parse->n_compiles)
 			return (false);
 		i++;
 	}
@@ -54,11 +54,11 @@ bool	is_done(t_codexion *codex)
 void wake_coders(t_codexion *codex)
 {
     int i = 0;
-    while(i < codex->parse->number_of_dongles)
+    while(i < codex->parse->n_dongles)
     {
-		pthread_mutex_lock(&codex->dongles[i].dongle_mutex);
-        pthread_cond_broadcast(&codex->dongles[i].dongle_cond);
-		pthread_mutex_unlock(&codex->dongles[i].dongle_mutex);
+		pthread_mutex_lock(&codex->usbs[i].usb_mutex);
+        pthread_cond_broadcast(&codex->usbs[i].usb_cond);
+		pthread_mutex_unlock(&codex->usbs[i].usb_mutex);
         i++;
     }
 }

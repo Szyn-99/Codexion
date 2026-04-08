@@ -35,7 +35,7 @@ int	main(int ac, char **av)
 		return (exit_error("Error: Failed to launch monitor\n"));
 	}
 	catch_coders(codexion, succeeded);
-	pthread_mutex_destroy(&codexion->sim_mutex);
+	pthread_mutex_destroy(&codexion->codex_mutex);
 	pthread_mutex_destroy(&codexion->log_mutex);
 	free_all(codexion);
 	free(codexion);

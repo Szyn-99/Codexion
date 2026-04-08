@@ -25,51 +25,48 @@ int	yes_int(char c)
 int	ft_atoi(char *str)
 {
 	int		i;
-	int		has_digit;
 	long	result;
 
 	i = 0;
-	has_digit = 0;
 	result = 0;
+	while (yes_space(str[i]))
+		i++;
+	if (!str[i])
+		return (-42);
 	while (str[i] != '\0')
 	{
-		if (yes_space(str[i]))
-			;
-		else if (yes_int(str[i]))
+		if (yes_int(str[i]))
 		{
 			if (((result * 10) + (str[i] - '0')) > 2147483647)
 				return (-42);
 			result = (result * 10) + (str[i] - '0');
-			has_digit = 1;
 		}
-		else
+		else if (!yes_space(str[i]))
 			return (-42);
 		i++;
 	}
-	if (!has_digit)
-		return (-42);
 	return (result);
 }
 
 
 void	init_coders_metadata(t_parse *main, char **av)
 {
-	main->number_of_coders = ft_atoi(av[1]);
-	main->number_of_dongles = main->number_of_coders;
-	main->time_to_burnout = ft_atoi(av[2]);
-	main->time_to_compile = ft_atoi(av[3]);
-	main->time_to_debug = ft_atoi(av[4]);
-	main->time_to_refactor = ft_atoi(av[5]);
-	main->number_of_compiles_required = ft_atoi(av[6]);
-	main->dongle_cooldown = ft_atoi(av[7]);
+	main->n_coders = ft_atoi(av[1]);
+	main->n_dongles = main->n_coders;
+	main->t_burnout = ft_atoi(av[2]);
+	main->t_compile = ft_atoi(av[3]);
+	main->t_debug = ft_atoi(av[4]);
+	main->t_refactor = ft_atoi(av[5]);
+	main->n_compiles = ft_atoi(av[6]);
+	main->dt_cooldown = ft_atoi(av[7]);
 	main->parse_result = 0;
 }
 
 int	parse_scheduler(char *s, t_parse *main)
 {
-	if (s[0] == 'f' && s[1] == 'i' && s[2] == 'f' && s[3] == 'o')
+	if (s[0] == 'f' && s[1] == 'i' && s[2] == 'f' && s[3] == 'o' && s[4] == '\0')
 		main->scheduler = "fifo";
-	else if (s[0] == 'e' && s[1] == 'd' && s[2] == 'f')
+	else if (s[0] == 'e' && s[1] == 'd' && s[2] == 'f' && s[3] == '\0')
 		main->scheduler = "edf";
 	else
 	{

@@ -22,8 +22,8 @@ long	get_time_ms(void)
 }
 long choose_priority(t_coder *coder)
 {
-    if (!coder->sim->parse->scheduler[3])
-        return coder->last_compile_start + coder->sim->parse->time_to_burnout;
+    if (!coder->codexion->parse->scheduler[3])
+        return coder->last_compile_start + coder->codexion->parse->t_burnout;
     return get_time_ms();
 }
 
@@ -31,7 +31,7 @@ void coder_logs(t_codexion *codex, long timestamp, int id, char *log)
 {
     long elapsed;
 
-    elapsed = timestamp - codex->start;
+    elapsed = timestamp - codex->start_time;
     if (elapsed < 0)
         elapsed = 0;
     pthread_mutex_lock(&codex->log_mutex);
@@ -43,15 +43,15 @@ void coder_logs(t_codexion *codex, long timestamp, int id, char *log)
 int finished_simulation(t_codexion *codex)
 {
     int finished;
-    pthread_mutex_lock(&codex->sim_mutex);
-    finished = codex->sim_over;
-    pthread_mutex_unlock(&codex->sim_mutex);
+    pthread_mutex_lock(&codex->codex_mutex);
+    finished = codex->codex_over;
+    pthread_mutex_unlock(&codex->codex_mutex);
     return finished;
 }
 
 void modify_sim_status(t_codexion *codex, int status)
 {
-    pthread_mutex_lock(&codex->sim_mutex);
-    codex->sim_over = status;
-    pthread_mutex_unlock(&codex->sim_mutex);
+    pthread_mutex_lock(&codex->codex_mutex);
+    codex->codex_over = status;
+    pthread_mutex_unlock(&codex->codex_mutex);
 }
