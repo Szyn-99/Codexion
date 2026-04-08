@@ -12,10 +12,10 @@
 
 #include "codexion.h"
 
-int exit_error(char *message)
+int	exit_error(char *message)
 {
 	printf("%s\n", message);
-	return 1;
+	return (1);
 }
 
 int	main(int ac, char **av)
@@ -30,15 +30,10 @@ int	main(int ac, char **av)
 	succeeded = release_coders(codexion);
 	if (!release_monitor(codexion))
 	{
-		free_all(codexion);
-		free(codexion);
+		clean_abort(codexion, 4);
 		return (exit_error("Error: Failed to launch monitor\n"));
 	}
 	catch_coders(codexion, succeeded);
-	pthread_mutex_destroy(&codexion->codex_mutex);
-	pthread_mutex_destroy(&codexion->log_mutex);
-	free_all(codexion);
-	free(codexion);
+	clean_abort(codexion, 4);
 	return (0);
 }
-	

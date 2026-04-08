@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_monitor.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/02 14:41:13 by aymel-ha         ###   ########.fr       */
+/*   Updated: 2026/04/08 23:40:05 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
 
 int	detect_lazy_coder(t_codexion *codex)
 {
@@ -51,17 +50,20 @@ bool	is_done(t_codexion *codex)
 	return (true);
 }
 
-void wake_coders(t_codexion *codex)
+void	wake_coders(t_codexion *codex)
 {
-    int i = 0;
-    while(i < codex->parse->n_dongles)
-    {
+	int	i;
+
+	i = 0;
+	while (i < codex->parse->n_dongles)
+	{
 		pthread_mutex_lock(&codex->usbs[i].usb_mutex);
-        pthread_cond_broadcast(&codex->usbs[i].usb_cond);
+		pthread_cond_broadcast(&codex->usbs[i].usb_cond);
 		pthread_mutex_unlock(&codex->usbs[i].usb_mutex);
-        i++;
-    }
+		i++;
+	}
 }
+
 void	*monitor_over_coders(void *arg)
 {
 	t_codexion	*codex;

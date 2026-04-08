@@ -12,16 +12,6 @@
 
 #include "codexion.h"
 
-int	yes_space(char c)
-{
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
-
-int	yes_int(char c)
-{
-	return (c >= '0' && c <= '9');
-}
-
 int	ft_atoi(char *str)
 {
 	int		i;
@@ -48,7 +38,6 @@ int	ft_atoi(char *str)
 	return (result);
 }
 
-
 void	init_coders_metadata(t_parse *main, char **av)
 {
 	main->n_coders = ft_atoi(av[1]);
@@ -64,7 +53,8 @@ void	init_coders_metadata(t_parse *main, char **av)
 
 int	parse_scheduler(char *s, t_parse *main)
 {
-	if (s[0] == 'f' && s[1] == 'i' && s[2] == 'f' && s[3] == 'o' && s[4] == '\0')
+	if (s[0] == 'f' && s[1] == 'i' && s[2] == 'f' && s[3] == 'o'
+		&& s[4] == '\0')
 		main->scheduler = "fifo";
 	else if (s[0] == 'e' && s[1] == 'd' && s[2] == 'f' && s[3] == '\0')
 		main->scheduler = "edf";
@@ -79,7 +69,7 @@ int	parse_scheduler(char *s, t_parse *main)
 
 void	ft_codexion_parser(t_parse *main, char **av, int ac)
 {
-	int		j;
+	int	j;
 
 	j = 1;
 	if (parse_scheduler(av[ac - 1], main) == -42)

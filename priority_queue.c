@@ -12,25 +12,38 @@
 
 #include "codexion.h"
 
-void classic_swap(t_waiter *linus, t_waiter *torvalds)
+void	classic_swap(t_waiter *linus, t_waiter *torvalds)
 {
-    t_waiter kernel = *linus;
-    *linus = *torvalds;
-    *torvalds = kernel;
+	t_waiter	kernel;
+
+	kernel = *linus;
+	*linus = *torvalds;
+	*torvalds = kernel;
 }
 
-void push_coder(int id, long priority, t_heap *heap)
+void	push_coder(int id, long priority, t_heap *heap)
 {
-    heap->waiters[heap->size].id = id;
-    heap->waiters[heap->size].priority = priority;
-    heap->size++;
-    if (heap->size == 2 && heap->waiters[0].priority > heap->waiters[1].priority)
-        classic_swap(&heap->waiters[0], &heap->waiters[1]);
+	heap->waiters[heap->size].id = id;
+	heap->waiters[heap->size].priority = priority;
+	heap->size++;
+	if (heap->size == 2
+		&& heap->waiters[0].priority > heap->waiters[1].priority)
+		classic_swap(&heap->waiters[0], &heap->waiters[1]);
 }
 
-void remove_coder(t_heap *heap)
+void	remove_coder(t_heap *heap)
 {
-    if(heap->size == 2)
-        heap->waiters[0] = heap->waiters[1];
-    heap->size--; 
+	if (heap->size == 2)
+		heap->waiters[0] = heap->waiters[1];
+	heap->size--;
+}
+
+int	yes_space(char c)
+{
+	return ((c >= 9 && c <= 13) || c == ' ');
+}
+
+int	yes_int(char c)
+{
+	return (c >= '0' && c <= '9');
 }

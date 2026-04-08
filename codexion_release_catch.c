@@ -22,8 +22,8 @@ int	release_coders(t_codexion *codex)
 	while (i < codex->parse->n_coders)
 	{
 		codex->coders[i].last_compile_start = codex->start_time;
-		check = pthread_create(&codex->coders[i].thread, NULL,
-				coders_routine, &codex->coders[i]);
+		check = pthread_create(&codex->coders[i].thread, NULL, coders_routine,
+				&codex->coders[i]);
 		if (check)
 		{
 			modify_sim_status(codex, 1);
@@ -34,23 +34,27 @@ int	release_coders(t_codexion *codex)
 	}
 	return (i);
 }
-bool release_monitor(t_codexion *codex)
+
+bool	release_monitor(t_codexion *codex)
 {
-    if(pthread_create(&codex->monitor, NULL, monitor_over_coders, codex))
-    {
-        modify_sim_status(codex, 1);
-        wake_coders(codex);
-        return false;
-    }
-    return true;
+	if (pthread_create(&codex->monitor, NULL, monitor_over_coders, codex))
+	{
+		modify_sim_status(codex, 1);
+		wake_coders(codex);
+		return (false);
+	}
+	return (true);
 }
-void catch_coders(t_codexion *codex, int succeeded)
+
+void	catch_coders(t_codexion *codex, int succeeded)
 {
-    int i = 0;
-    while(i < succeeded)
-    {
-        pthread_join(codex->coders[i].thread, NULL);
-        i++;
-    }
-    pthread_join(codex->monitor, NULL);
+	int	i;
+
+	i = 0;
+	while (i < succeeded)
+	{
+		pthread_join(codex->coders[i].thread, NULL);
+		i++;
+	}
+	pthread_join(codex->monitor, NULL);
 }

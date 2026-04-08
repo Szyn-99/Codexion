@@ -7,7 +7,8 @@ SOURCE_FILE = codexion.c \
 			codexion_init.c \
 			codexion_utils.c \
 			priority_queue.c \
-			codexion_croutine.c \
+			codexion_ritual.c \
+			codexion_coders_ritual.c \
 			codexion_monitor.c \
 			codexion_release_catch.c
 
