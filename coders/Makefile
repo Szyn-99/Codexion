@@ -1,6 +1,6 @@
 NAME = codexion
 HEADER = codexion.h
-FLAGS = -g -Wall -Wextra -Werror -pthread
+FLAGS = -Wall -Wextra -Werror -pthread
 SOURCE_FILE = codexion.c \
 			parsing_arguments.c \
 			codexion_free_utils.c \

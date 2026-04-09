@@ -2,7 +2,9 @@
 
 from sys import argv
 
-
+# It tells you if your parameters are theoretically survivable before you waste 30 seconds watching threads fight.
+# Even a "Mathematically Fair" test
+# can burn out on underpowered hardware — rule of thumb: keep at least **100ms of headroom** above the minimum.
 if __name__ == "__main__":
     """Explanation: if there's even number of coders, there will be two batches of coders one compiling one waiting
     , if there's odd number of coders, there will be three batches of coders one compiling one waiting one waiting for the waiting one to finish"""

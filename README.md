@@ -1,43 +1,128 @@
 *This project has been created as part of the 42 curriculum by aymel-ha.*
 
-# Codexion: Master the race for resources before the deadline masters you
+# Codexion — Race Against the Deadline
+
+> *"The challenge is not writing the code — it is writing it before the deadline writes you off."*
+
+---
 
 ## Description
-Codexion is an advanced thread-orchestration and synchronization project challenging developers to coordinate multiple coders competing for limited USB dongles using POSIX threads, mutexes, and smart scheduling policies (FIFO and EDF). Coders cycle through compiling, debugging, and refactoring phases while adhering to strict cooldown barriers and burnout timelines.
+
+Ever wondered what happens when 200 developers fight over 4 USB dongles? Welcome to **Codexion**.
+
+This project is a turbocharged spin on the classic [Dining Philosophers problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem), rebuilt for the modern coding hub. Instead of philosophers and forks, you have coders and USB dongles — and instead of spaghetti, there's quantum code to compile before someone burns out.
+
+Each coder sits around a shared Quantum Compiler, cycling through three phases:
+- **Compiling** — requires two dongles simultaneously (one in each hand)
+- **Debugging** — solo work, no dongles needed
+- **Refactoring** — solo work, then back to compiling they go
+
+The simulation ends when either:
+- Every coder has compiled enough times.
+- Some Coder burns out from dongle starvation.
+
+Under the hood, this is a deep dive into **POSIX threads, mutex synchronization, condition variables, priority queues, and scheduling policies (FIFO & EDF)** — all written in C, from scratch, with zero global variables.
+
+---
 
 ## Instructions
-**Compilation:**
-To compile the system, leverage the included Makefile. It strictly processes via `cc` with all standard 42 verification flags (`-Wall -Wextra -Werror` and tightly integrates `-pthread` for POSIX multithreading):
+
+### Building
+
+Navigate into the source directory and run:
+
 ```bash
 cd coders
 make
 ```
 
-**Execution:**
-Execute the compiled `codexion` binary with precisely 8 arguments:
+This compiles with `-Wall -Wextra -Werror -pthread`. Clean build every time.
+
+To clean up:
 ```bash
-./codexion <number_of_coders> <time_to_burnout> <time_to_compile> <time_to_debug> <time_to_refactor> <number_of_compiles_required> <dongle_cooldown> <scheduler>
+make fclean   # removes binaries and objects
+make re       # full rebuild from scratch
 ```
-*Example:* Minimum 200 coders relying on EDF scheduler to prevent burnout
+
+### Running
+
 ```bash
-./codexion 200 620 200 5 3 50 100 edf
+./codexion <number_of_coders> <time_to_burnout> <time_to_compile> \
+           <time_to_debug> <time_to_refactor> \
+           <number_of_compiles_required> <dongle_cooldown> <scheduler>
+```
+
+| Argument | What it means |
+|---|---|
+| `number_of_coders` | How many coders (= how many dongles) |
+| `time_to_burnout` | Max time (ms) a coder can go without starting a compile |
+| `time_to_compile` | How long compiling takes (ms) |
+| `time_to_debug` | How long debugging takes (ms) |
+| `time_to_refactor` | How long refactoring takes (ms) |
+| `number_of_compiles_required` | Compiles needed per coder to win |
+| `dongle_cooldown` | How long a dongle is locked after release (ms) |
+| `scheduler` | `fifo` (first come first served) or `edf` (earliest deadline first) |
+
+### Example
+
+```bash
+# 5 coders, 800ms burnout limit, 200ms compile, EDF scheduling
+./codexion 5 800 200 50 30 10 100 edf
 ```
 
 ## Resources
-- [POSIX Threads Programming (Pthreads)](https://computing.llnl.gov/tutorials/pthreads/)
-- [Coffman's Deadlock Conditions](https://en.wikipedia.org/wiki/Deadlock#Necessary_conditions)
-- [Dining Philosophers Problem Analysis](https://en.wikipedia.org/wiki/Dining_philosophers_problem)
-- **AI Integration**: AI agents provided critical insights mathematically structuring the resource indexing hierarchy to securely prevent Dijkstra deadlocks, isolating exact POSIX condition variables to properly enforce waiting periods, conducting extensive memory-safety audits resulting in the deployment of `clean_abort` teardowns to eradicate Use-After-Frees, and validating Priority Queue math parameters mapping custom `time_to_burnout` EDF thresholds securely.
 
-## Blocking cases handled
-- **Deadlock Prevention (Coffman's Conditions):** A specific memory resource hierarchy was rigorously mapped out dynamically in `hand_dongles()` to guarantee total thread parameter parity. Coders inherently lock their `lowest_usb` structure pointer before their `highest_usb` address constraint, permanently shutting down parallel sequence circular locks.
-- **Starvation Prevention:** A robust 2-element Priority Heap (`priority_queue.c`) tracks and governs dongles dynamically against "Earliest Deadline" criteria mapped onto each waiting coder reducing unfair thread scheduling metrics. 
-- **Cooldown Handling:** Coder release mechanisms append a specific absolute duration threshold onto `served_at`, pushing subsequent callers inside a `pthread_cond_timedwait` execution natively avoiding active loops.
-- **Precise Burnout Detection:** A totally independent master Monitor thread polls all nodes iterating aggressively within a `usleep(1000)` timeline to safely assert that elapsed timelines meet `t_burnout` parameters mathematically isolating and terminating logs safely `< 10ms`.
-- **Log Serialization:** Console standard output limits overlap or interleave messages distinctly via the `log_mutex` constraint guaranteeing sequential data parsing.
+- **[The Linux Programming Interface — Michael Kerrisk](https://man7.org/tlpi/)**
+  The bible of Linux system programming. Chapters 29–33 on POSIX threads were instrumental in understanding how `pthread_create`, `pthread_mutex_t`, and `pthread_cond_t` actually work under the hood — not just the API, but the *why*. Particularly eye-opening: how condition variables interact with mutexes to guard against spurious wakeups and missed signals, which directly shaped the design of `wait_for_usb` and `bring_two_usbs`.
 
-## Thread synchronization mechanisms
-- **`pthread_mutex_t`**: Mutex logic rigorously wraps explicit parameter boundaries guaranteeing mutual exclusion against the `codex_over` check protocols utilizing the structural `codex_mutex`. Additionally, each dongle independently locks via localized bounds mitigating thread collision safely.
-- **`pthread_cond_t`**: Event signal handling operates seamlessly utilizing Condition Variables across queue cycles ensuring optimal CPU efficiency. Released dongles intrinsically transmit `pthread_cond_broadcast` signaling suspended systems into targeted wakeups resolving exact access protocols.
-- **Race Conditions Prevented**: Data races are thoroughly eradicated globally by protecting evaluation iterations (like comparing integer compilation cycles spanning `n_coders`) securely within distinct master read/write locks (`is_done()` functionality limits collision natively). 
-- **Safe Shared State Communication**: Monitor orchestration communicates with standard parallel threads uniquely via boolean flag modification (`modify_sim_status`) strictly governed by `codex_mutex`, preventing corrupted teardowns prior to runtime thread execution shutdowns entirely.
+- **[Dining Philosophers Problem — Wikipedia](https://en.wikipedia.org/wiki/Dining_philosophers_problem)**
+  The conceptual ancestor of this project. Understanding Dijkstra's original formulation (and why naive solutions deadlock) frames everything here.
+
+- **[POSIX Threads Programming — LLNL](https://computing.llnl.gov/tutorials/pthreads/)**
+  A practical companion to Kerrisk for thread lifecycle, synchronization primitives, and scheduling behaviour.
+
+- **[Deadlock — Coffman Conditions](https://en.wikipedia.org/wiki/Deadlock#Necessary_conditions)**
+  The four conditions (mutual exclusion, hold and wait, no preemption, circular wait) and why breaking even one of them is enough to prevent deadlock entirely.
+
+- **AI Integration**
+  AI assistance was used throughout the project for: analyzing the resource ordering strategy to prevent circular-wait deadlocks, auditing memory safety and identifying a Use-After-Free risk in the monitor shutdown path, simplifying the `wait_for_usb` timespec calculation, and reviewing EDF priority queue correctness. All generated logic was reviewed, understood, and validated before integration.
+
+---
+
+## Blocking Cases Handled
+
+### Deadlock Prevention
+The classic Dining Philosophers trap: two adjacent coders each grab one dongle and wait forever for the other. We prevent this with **resource ordering** inside `hand_dongles()` — every coder always locks the dongle with the lower array index first. This breaks the circular-wait Coffman condition entirely. No deadlock is possible.
+
+### Starvation Prevention
+With EDF scheduling, dongles are granted to the coder whose burnout deadline is closest. This means nobody gets stuck behind a coder who has plenty of time left — the most at-risk coder always gets priority. The scheduler is backed by a custom 2-slot priority heap (`priority_queue.c`) that handles the FIFO/EDF arbitration cleanly.
+
+### Cooldown Handling
+After a coder releases a dongle, it becomes unavailable for `dongle_cooldown` milliseconds. Rather than spinning in a busy loop, waiting coders are suspended via `pthread_cond_timedwait` with a deadline set directly from the dongle's `served_at` field. No wasted CPU cycles.
+
+### Precise Burnout Detection
+A dedicated monitor thread checks every half-millisecond (`usleep(500)`) whether any coder has exceeded their burnout threshold. When one is detected, the burnout log is printed and the simulation is cleanly stopped — guaranteed within 10ms of the actual burnout moment, as required by the subject.
+
+### Log Serialization
+All output goes through a single `log_mutex`. This ensures that two coder messages never interleave on the same line, even when 200 threads are trying to write simultaneously.
+
+---
+
+## Thread Synchronization Mechanisms
+
+### `pthread_mutex_t`
+Used in three places:
+- **Per-dongle mutex** (`usb_mutex`): Guards each dongle's state (free/taken, queue, cooldown timer). Coders lock this before reading or modifying a dongle.
+- **`codex_mutex`**: Protects the global simulation status flag (`codex_over`). Used by the monitor to signal termination, and by coders to check if they should stop.
+- **`log_mutex`**: Serializes all `printf` calls so output never gets mangled.
+
+### `pthread_cond_t`
+Each dongle has a `usb_cond` condition variable. When a coder needs a dongle that isn't ready (either busy or in cooldown), it waits on the condition variable instead of spinning. When a dongle is released, `pthread_cond_broadcast` wakes all waiters, and the scheduler's priority queue decides who gets it next.
+
+### Race Condition Prevention
+- The `codex_over` flag is **always** read and written under `codex_mutex` — never bare.
+- Dongle state is **always** accessed under `usb_mutex` — condition checks, queue updates, and state transitions are atomic with respect to other threads.
+- The two-dongle acquisition in `bring_two_usbs` carefully releases and re-acquires mutexes in a defined order, avoiding the classic ABBA deadlock pattern.
+
+### Safe Monitor to Coder Communication
+The monitor thread sets `codex_over = 1` under `codex_mutex`, then broadcasts on all condition variables to wake sleeping coders. Coders check the flag regularly inside their main loop and exit gracefully without touching freed memory.
