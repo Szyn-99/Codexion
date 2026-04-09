@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/08 23:40:05 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/09 12:27:08 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,19 +70,19 @@ void	*monitor_over_coders(void *arg)
 	int			lazy;
 
 	codex = (t_codexion *)arg;
-	while (!finished_simulation(codex))
+	while (!ritual_ended(codex))
 	{
 		lazy = detect_lazy_coder(codex);
 		if (lazy != -42)
 		{
-			modify_sim_status(codex, 1);
+			modify_ritual_status(codex, 1);
 			coder_logs(codex, get_time_ms(), lazy, "burned out");
 			wake_coders(codex);
 			return (NULL);
 		}
 		if (is_done(codex))
 		{
-			modify_sim_status(codex, 1);
+			modify_ritual_status(codex, 1);
 			wake_coders(codex);
 			return (NULL);
 		}

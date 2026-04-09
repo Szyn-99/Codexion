@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 04:02:24 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/02 10:41:55 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/09 12:24:46 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,8 @@ long						get_time_ms(void);
 void						coder_logs(t_codexion *codex, long timestamp,
 								int id, char *log);
 long						choose_priority(t_coder *coder);
-int							finished_simulation(t_codexion *codex);
-void						modify_sim_status(t_codexion *codex, int status);
+int							ritual_ended(t_codexion *codex);
+void						modify_ritual_status(t_codexion *codex, int status);
 bool						clean_abort(t_codexion *cdx, int level);
 /* ========== priority_queue.c ========== */
 void						classic_swap(t_waiter *linus, t_waiter *torvalds);
@@ -120,15 +120,15 @@ void						push_coder(int id, long priority, t_heap *heap);
 void						remove_coder(t_heap *heap);
 /* ========== codexion_coders_ritual.c ========== */
 int							check_ready(t_usb *d, int id);
-void						wait_on_cond(t_usb *d, int id);
-void						wait_for_pair(t_usb *a, t_usb *b, int id,
-								t_codexion *cdx);
+void						wait_for_usb(t_usb *d, int id);
+void						bring_two_usbs(t_usb *lowest, t_usb *highest,
+								int id, t_codexion *cdx);
 
 /* ========== codexion_ritual.c ========== */
 int							take_two_dongles(t_codexion *codex, t_coder *coder);
 void						put_dongle(t_usb *usb, t_codexion *codex);
 void						coders_phases(t_coder *coder, int phase);
-void						*coders_routine(void *arg);
+void						*run_coders_ritual(void *arg);
 
 /* ========== codexion_monitor.c ========== */
 int							detect_lazy_coder(t_codexion *codex);

@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/08 23:39:27 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/09 12:25:46 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int	take_two_dongles(t_codexion *codex, t_coder *coder)
 	pthread_mutex_lock(&coder->highest_usb->usb_mutex);
 	push_coder(coder->id, choose_priority(coder), &coder->lowest_usb->queue);
 	push_coder(coder->id, choose_priority(coder), &coder->highest_usb->queue);
-	wait_for_pair(coder->lowest_usb, coder->highest_usb, coder->id, codex);
-	got = !finished_simulation(codex);
+	bring_two_usbs(coder->lowest_usb, coder->highest_usb, coder->id, codex);
+	got = !ritual_ended(codex);
 	remove_coder(&coder->lowest_usb->queue);
 	remove_coder(&coder->highest_usb->queue);
 	coder->lowest_usb->free = got;
@@ -73,23 +73,23 @@ void	coders_phases(t_coder *coder, int phase)
 	}
 }
 
-static int	run_cycle(t_coder *coder)
+static int	ritual(t_coder *coder)
 {
 	if (!take_two_dongles(coder->codexion, coder))
 		return (0);
 	coders_phases(coder, 0x1);
 	put_dongle(coder->lowest_usb, coder->codexion);
 	put_dongle(coder->highest_usb, coder->codexion);
-	if (finished_simulation(coder->codexion))
+	if (ritual_ended(coder->codexion))
 		return (0);
 	coders_phases(coder, 0x2);
-	if (finished_simulation(coder->codexion))
+	if (ritual_ended(coder->codexion))
 		return (0);
 	coders_phases(coder, 0x3);
 	return (1);
 }
 
-void	*coders_routine(void *arg)
+void	*run_coders_ritual(void *arg)
 {
 	t_coder	*coder;
 	int		n;
@@ -98,7 +98,7 @@ void	*coders_routine(void *arg)
 	n = coder->codexion->parse->n_coders;
 	if (n == 1)
 	{
-		while (!finished_simulation(coder->codexion))
+		while (!ritual_ended(coder->codexion))
 			usleep(1000);
 		return (NULL);
 	}
@@ -108,8 +108,8 @@ void	*coders_routine(void *arg)
 	else if (n % 2 == 1 && coder->id == n)
 		usleep(2 * (coder->codexion->parse->t_compile
 				+ coder->codexion->parse->dt_cooldown) * 1000);
-	while (!finished_simulation(coder->codexion))
-		if (!run_cycle(coder))
+	while (!ritual_ended(coder->codexion))
+		if (!ritual(coder))
 			break ;
 	return (NULL);
 }

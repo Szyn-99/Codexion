@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:05:00 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/02 10:53:22 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/09 12:25:02 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,12 @@ void	coder_logs(t_codexion *codex, long timestamp, int id, char *log)
 	if (elapsed < 0)
 		elapsed = 0;
 	pthread_mutex_lock(&codex->log_mutex);
-	if (!finished_simulation(codex) || log[0] == 'b')
+	if (!ritual_ended(codex) || log[0] == 'b')
 		printf("%ld %d %s\n", elapsed, id, log);
 	pthread_mutex_unlock(&codex->log_mutex);
 }
 
-int	finished_simulation(t_codexion *codex)
+int	ritual_ended(t_codexion *codex)
 {
 	int	finished;
 
@@ -52,7 +52,7 @@ int	finished_simulation(t_codexion *codex)
 	return (finished);
 }
 
-void	modify_sim_status(t_codexion *codex, int status)
+void	modify_ritual_status(t_codexion *codex, int status)
 {
 	pthread_mutex_lock(&codex->codex_mutex);
 	codex->codex_over = status;

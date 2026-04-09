@@ -6,13 +6,13 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 23:39:06 by szyn              #+#    #+#             */
-/*   Updated: 2026/04/09 11:54:16 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/09 12:26:11 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	check_ready(t_usb *d, int id)
+int	usb_ready(t_usb *d, int id)
 {
 	long	now;
 
@@ -20,7 +20,7 @@ int	check_ready(t_usb *d, int id)
 	return (!d->free && d->queue.waiters[0].id == id && now >= d->served_at);
 }
 
-void	wait_on_cond(t_usb *d, int id)
+void	wait_for_usb(t_usb *d, int id)
 {
 	struct timespec	ts;
 	long			timeleft;
@@ -35,33 +35,33 @@ void	wait_on_cond(t_usb *d, int id)
 		pthread_cond_timedwait(&d->usb_cond, &d->usb_mutex, &ts);
 	}
 	else
-		pthread_cond_wait(&d->usb_cond, &d->usb_mutex);	
+		pthread_cond_wait(&d->usb_cond, &d->usb_mutex);
 }
 
-void	wait_for_pair(t_usb *a, t_usb *b, int id, t_codexion *cdx)
+void	bring_two_usbs(t_usb *lowest, t_usb *highest, int id, t_codexion *cdx)
 {
-	int	a_r;
-	int	b_r;
+	int	lowest_r;
+	int	highest_r;
 
-	while (!finished_simulation(cdx))
+	while (!ritual_ended(cdx))
 	{
-		a_r = check_ready(a, id);
-		b_r = check_ready(b, id);
-		if (a_r && b_r)
+		lowest_r = usb_ready(lowest, id);
+		highest_r = usb_ready(highest, id);
+		if (lowest_r && highest_r)
 			break ;
-		if (!a_r)
+		if (!lowest_r)
 		{
-			pthread_mutex_unlock(&b->usb_mutex);
-			wait_on_cond(a, id);
-			pthread_mutex_lock(&b->usb_mutex);
+			pthread_mutex_unlock(&highest->usb_mutex);
+			wait_for_usb(lowest, id);
+			pthread_mutex_lock(&highest->usb_mutex);
 		}
 		else
 		{
-			pthread_mutex_unlock(&a->usb_mutex);
-			wait_on_cond(b, id);
-			pthread_mutex_unlock(&b->usb_mutex);
-			pthread_mutex_lock(&a->usb_mutex);
-			pthread_mutex_lock(&b->usb_mutex);
+			pthread_mutex_unlock(&lowest->usb_mutex);
+			wait_for_usb(highest, id);
+			pthread_mutex_unlock(&highest->usb_mutex);
+			pthread_mutex_lock(&lowest->usb_mutex);
+			pthread_mutex_lock(&highest->usb_mutex);
 		}
 	}
 }
