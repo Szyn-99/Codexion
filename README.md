@@ -78,9 +78,6 @@ make re       # full rebuild from scratch
 - **[Dining Philosophers Problem — Wikipedia](https://en.wikipedia.org/wiki/Dining_philosophers_problem)**
   The conceptual ancestor of this project. Understanding Dijkstra's original formulation (and why naive solutions deadlock) frames everything here.
 
-- **[POSIX Threads Programming — LLNL](https://computing.llnl.gov/tutorials/pthreads/)**
-  A practical companion to Kerrisk for thread lifecycle, synchronization primitives, and scheduling behaviour.
-
 - **[Deadlock — Coffman Conditions](https://en.wikipedia.org/wiki/Deadlock#Necessary_conditions)**
   The four conditions (mutual exclusion, hold and wait, no preemption, circular wait) and why breaking even one of them is enough to prevent deadlock entirely.
 
