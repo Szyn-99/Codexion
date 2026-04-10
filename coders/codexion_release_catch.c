@@ -54,5 +54,4 @@ void	catch_coders(t_codexion *codex, int succeeded)
 		pthread_join(codex->coders[i].thread, NULL);
 		i++;
 	}
-	pthread_join(codex->monitor, NULL);
 }

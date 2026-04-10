@@ -6,15 +6,15 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/09 12:25:46 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 04:04:06 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	take_two_dongles(t_codexion *codex, t_coder *coder)
+bool	take_two_dongles(t_codexion *codex, t_coder *coder)
 {
-	int		got;
+	bool	got;
 	long	now;
 
 	pthread_mutex_lock(&coder->lowest_usb->usb_mutex);
@@ -73,20 +73,20 @@ void	coders_phases(t_coder *coder, int phase)
 	}
 }
 
-static int	ritual(t_coder *coder)
+bool	ritual(t_coder *coder)
 {
 	if (!take_two_dongles(coder->codexion, coder))
-		return (0);
+		return (false);
 	coders_phases(coder, 0x1);
 	put_dongle(coder->lowest_usb, coder->codexion);
 	put_dongle(coder->highest_usb, coder->codexion);
 	if (ritual_ended(coder->codexion))
-		return (0);
+		return (false);
 	coders_phases(coder, 0x2);
 	if (ritual_ended(coder->codexion))
-		return (0);
+		return (false);
 	coders_phases(coder, 0x3);
-	return (1);
+	return (true);
 }
 
 void	*run_coders_ritual(void *arg)

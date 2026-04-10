@@ -35,6 +35,7 @@ int	main(int ac, char **av)
 		return (exit_error("Error: Failed to launch monitor\n"));
 	}
 	catch_coders(codexion, succeeded);
+	pthread_join(codexion->monitor, NULL);
 	clean_abort(codexion, 4);
 	return (0);
 }

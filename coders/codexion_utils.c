@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:05:00 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/09 12:25:02 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 04:48:05 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,9 @@
 long	get_time_ms(void)
 {
 	struct timeval	tv;
-	long			millisecond;
 
 	gettimeofday(&tv, NULL);
-	millisecond = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-	return (millisecond);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
 long	choose_priority(t_coder *coder)
@@ -31,14 +29,14 @@ long	choose_priority(t_coder *coder)
 
 void	coder_logs(t_codexion *codex, long timestamp, int id, char *log)
 {
-	long	elapsed;
+	long	timeleft;
 
-	elapsed = timestamp - codex->start_time;
-	if (elapsed < 0)
-		elapsed = 0;
+	timeleft = timestamp - codex->start_time;
+	if (timeleft < 0)
+		timeleft = 0;
 	pthread_mutex_lock(&codex->log_mutex);
 	if (!ritual_ended(codex) || log[0] == 'b')
-		printf("%ld %d %s\n", elapsed, id, log);
+		printf("%ld %d %s\n", timeleft, id, log);
 	pthread_mutex_unlock(&codex->log_mutex);
 }
 

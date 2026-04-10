@@ -6,18 +6,16 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 23:39:06 by szyn              #+#    #+#             */
-/*   Updated: 2026/04/09 12:26:11 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 04:09:59 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	usb_ready(t_usb *d, int id)
+bool	usb_ready(t_usb *d, int id)
 {
-	long	now;
-
-	now = get_time_ms();
-	return (!d->free && d->queue.waiters[0].id == id && now >= d->served_at);
+	return (!d->free && d->queue.waiters[0].id == id
+		&& get_time_ms() >= d->served_at);
 }
 
 void	wait_for_usb(t_usb *d, int id)

@@ -6,7 +6,7 @@
 /*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/09 12:27:08 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 04:33:14 by szyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	detect_lazy_coder(t_codexion *codex)
 {
-	long	criteria;
 	long	last;
+	long	criteria;
 	int		i;
 
 	i = 0;
@@ -32,7 +32,7 @@ int	detect_lazy_coder(t_codexion *codex)
 	return (-42);
 }
 
-bool	is_done(t_codexion *codex)
+bool	goal_achieved(t_codexion *codex)
 {
 	int	compiles;
 	int	i;
@@ -80,13 +80,13 @@ void	*monitor_over_coders(void *arg)
 			wake_coders(codex);
 			return (NULL);
 		}
-		if (is_done(codex))
+		if (goal_achieved(codex))
 		{
 			modify_ritual_status(codex, 1);
 			wake_coders(codex);
 			return (NULL);
 		}
-		usleep(500);
+		usleep(100);
 	}
 	return (NULL);
 }
