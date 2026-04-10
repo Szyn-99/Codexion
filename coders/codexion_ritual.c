@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_ritual.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 14:23:02 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/10 04:04:06 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 10:07:20 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ bool	take_two_dongles(t_codexion *codex, t_coder *coder)
 	remove_coder(&coder->highest_usb->queue);
 	coder->lowest_usb->free = got;
 	coder->highest_usb->free = got;
-	now = get_time_ms();
+	now = current_time_ms();
 	pthread_mutex_unlock(&coder->highest_usb->usb_mutex);
 	pthread_mutex_unlock(&coder->lowest_usb->usb_mutex);
 	if (got)
@@ -42,7 +42,7 @@ void	put_dongle(t_usb *usb, t_codexion *codex)
 {
 	pthread_mutex_lock(&usb->usb_mutex);
 	usb->free = 0;
-	usb->served_at = get_time_ms() + codex->parse->dt_cooldown;
+	usb->served_at = current_time_ms() + codex->parse->dt_cooldown;
 	pthread_cond_broadcast(&usb->usb_cond);
 	pthread_mutex_unlock(&usb->usb_mutex);
 }
@@ -54,7 +54,7 @@ void	coders_phases(t_coder *coder, int phase)
 	if (phase == 0x1)
 	{
 		pthread_mutex_lock(&coder->codexion->codex_mutex);
-		ms = get_time_ms();
+		ms = current_time_ms();
 		coder->last_compile_start = ms;
 		coder->compiles_done++;
 		pthread_mutex_unlock(&coder->codexion->codex_mutex);
@@ -63,12 +63,14 @@ void	coders_phases(t_coder *coder, int phase)
 	}
 	else if (phase == 0x2)
 	{
-		coder_logs(coder->codexion, get_time_ms(), coder->id, "is debugging");
+		coder_logs(coder->codexion, current_time_ms(), coder->id,
+			"is debugging");
 		usleep(coder->codexion->parse->t_debug * 1000);
 	}
 	else if (phase == 0x3)
 	{
-		coder_logs(coder->codexion, get_time_ms(), coder->id, "is refactoring");
+		coder_logs(coder->codexion, current_time_ms(), coder->id,
+			"is refactoring");
 		usleep(coder->codexion->parse->t_refactor * 1000);
 	}
 }

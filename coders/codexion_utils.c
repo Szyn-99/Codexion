@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:05:00 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/10 04:48:05 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 10:07:20 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-long	get_time_ms(void)
+long	current_time_ms(void)
 {
 	struct timeval	tv;
 
@@ -24,7 +24,7 @@ long	choose_priority(t_coder *coder)
 {
 	if (!coder->codexion->parse->scheduler[3])
 		return (coder->last_compile_start + coder->codexion->parse->t_burnout);
-	return (get_time_ms());
+	return (current_time_ms());
 }
 
 void	coder_logs(t_codexion *codex, long timestamp, int id, char *log)

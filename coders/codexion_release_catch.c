@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_release_catch.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:30:19 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/09 12:28:15 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 10:07:20 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	release_coders(t_codexion *codex)
 {
 	int	i;
 
-	codex->start_time = get_time_ms();
+	codex->start_time = current_time_ms();
 	i = 0;
 	while (i < codex->parse->n_coders)
 	{

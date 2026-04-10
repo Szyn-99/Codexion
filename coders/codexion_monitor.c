@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_monitor.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 12:51:21 by aymel-ha          #+#    #+#             */
-/*   Updated: 2026/04/10 04:33:14 by szyn             ###   ########.fr       */
+/*   Updated: 2026/04/10 10:17:35 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	detect_lazy_coder(t_codexion *codex)
 	i = 0;
 	while (i < codex->parse->n_coders)
 	{
-		criteria = get_time_ms();
+		criteria = current_time_ms();
 		pthread_mutex_lock(&codex->codex_mutex);
 		last = codex->coders[i].last_compile_start;
 		pthread_mutex_unlock(&codex->codex_mutex);
@@ -76,7 +76,7 @@ void	*monitor_over_coders(void *arg)
 		if (lazy != -42)
 		{
 			modify_ritual_status(codex, 1);
-			coder_logs(codex, get_time_ms(), lazy, "burned out");
+			coder_logs(codex, current_time_ms(), lazy, "burned out");
 			wake_coders(codex);
 			return (NULL);
 		}
@@ -86,7 +86,7 @@ void	*monitor_over_coders(void *arg)
 			wake_coders(codex);
 			return (NULL);
 		}
-		usleep(100);
+		usleep(500);
 	}
 	return (NULL);
 }

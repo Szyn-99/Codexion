@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion_coders_ritual.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: szyn <szyn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aymel-ha <aymel-ha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/04/08 23:39:06 by szyn              #+#    #+#             */
-/*   Updated: 2026/04/10 04:09:59 by szyn             ###   ########.fr       */
+/*   Created: 2026/04/08 23:39:06 by aymel-ha          #+#    #+#             */
+/*   Updated: 2026/04/10 10:13:47 by aymel-ha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 bool	usb_ready(t_usb *d, int id)
 {
 	return (!d->free && d->queue.waiters[0].id == id
-		&& get_time_ms() >= d->served_at);
+		&& current_time_ms() >= d->served_at);
 }
 
 void	wait_for_usb(t_usb *d, int id)
@@ -25,7 +25,7 @@ void	wait_for_usb(t_usb *d, int id)
 
 	if (!d->free && d->queue.waiters[0].id == id)
 	{
-		timeleft = d->served_at - get_time_ms();
+		timeleft = d->served_at - current_time_ms();
 		if (timeleft <= 0)
 			return ;
 		ts.tv_sec = d->served_at / 1000;
